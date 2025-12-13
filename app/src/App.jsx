@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain } from 'lucide-react';
+import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2 } from 'lucide-react';
 
 // --- CUSTOM SWISS FLAG COMPONENT ---
 const SwissFlag = ({ size = 24, className = "" }) => (
@@ -10,6 +10,7 @@ const SwissFlag = ({ size = 24, className = "" }) => (
 );
 
 import { QUESTIONS_DATA } from './questionsData';
+
 
 // --- COMPONENTS ---
 
@@ -46,11 +47,36 @@ const Button = ({ children, onClick, variant = "primary", className = "", disabl
   );
 };
 
-// --- LOGIC: SMART LEARNING SYSTEM ---
+// --- LOGIC: SMART LEARNING SYSTEM (WITH LOCAL STORAGE) ---
 
 const useSmartLearning = () => {
   // Structure: { [questionId]: { correctCount: 0, incorrectCount: 0, lastResult: 'correct' | 'incorrect' } }
-  const [progress, setProgress] = useState({});
+  
+  // 1. Initialize from LocalStorage
+  const [progress, setProgress] = useState(() => {
+    try {
+      const saved = localStorage.getItem('zurich-quiz-progress');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      console.error("Failed to load progress from localStorage", e);
+      return {};
+    }
+  });
+
+  // 2. Save to LocalStorage whenever progress changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('zurich-quiz-progress', JSON.stringify(progress));
+    } catch (e) {
+      console.error("Failed to save progress to localStorage", e);
+    }
+  }, [progress]);
+
+  // Function to reset progress
+  const resetProgress = () => {
+    setProgress({});
+    localStorage.removeItem('zurich-quiz-progress');
+  };
 
   const updateProgress = (questionId, isCorrect) => {
     setProgress(prev => {
@@ -67,13 +93,7 @@ const useSmartLearning = () => {
   };
 
   const getWeightedQuestions = (allQuestions, count = 15) => {
-    // Weight calculation:
-    // Base weight = 1
-    // +2 if last answer was incorrect
-    // +1 for every incorrect answer total
-    // +0.5 if never answered
-    // -1 for every correct answer (min weight 0.1)
-    
+    // Weight calculation logic...
     const weightedQuestions = allQuestions.map(q => {
       const stats = progress[q.id] || { correctCount: 0, incorrectCount: 0, lastResult: null };
       
@@ -104,7 +124,6 @@ const useSmartLearning = () => {
           break;
         }
       }
-      // Fallback for rounding errors
       if (selectedIndex === -1) selectedIndex = pool.length - 1;
 
       selected.push(pool[selectedIndex]);
@@ -121,13 +140,12 @@ const useSmartLearning = () => {
     });
   };
 
-  return { progress, updateProgress, getWeightedQuestions, getWeakestQuestions };
+  return { progress, updateProgress, getWeightedQuestions, getWeakestQuestions, resetProgress };
 };
 
 // --- SCREENS ---
 
-const WelcomeScreen = ({ onStart, onStartFlashcards, progress }) => {
-  // Calculate simple stats
+const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
   const totalAnswered = Object.keys(progress).length;
   const correctAnswers = Object.values(progress).reduce((sum, p) => sum + p.correctCount, 0);
   const totalAttempts = Object.values(progress).reduce((sum, p) => sum + p.correctCount + p.incorrectCount, 0);
@@ -146,18 +164,25 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress }) => {
         </p>
       </div>
 
-      {/* Stats Mini-Dashboard */}
       {totalAnswered > 0 && (
-        <div className="flex gap-6 justify-center w-full max-w-md bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-slate-800">{totalAnswered}</div>
-            <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">Fragen gesehen</div>
+        <div className="w-full max-w-md">
+          <div className="flex gap-6 justify-center w-full bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-slate-800">{totalAnswered}</div>
+              <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">Fragen gesehen</div>
+            </div>
+            <div className="w-px bg-slate-200"></div>
+            <div className="text-center">
+              <div className={`text-2xl font-bold ${masteryRate >= 80 ? 'text-green-600' : 'text-slate-800'}`}>{masteryRate}%</div>
+              <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">Erfolgsquote</div>
+            </div>
           </div>
-          <div className="w-px bg-slate-200"></div>
-          <div className="text-center">
-            <div className={`text-2xl font-bold ${masteryRate >= 80 ? 'text-green-600' : 'text-slate-800'}`}>{masteryRate}%</div>
-            <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">Erfolgsquote</div>
-          </div>
+          <button 
+            onClick={onReset}
+            className="text-xs text-red-400 hover:text-red-600 flex items-center justify-center gap-1 mx-auto transition-colors"
+          >
+            <Trash2 size={12} /> Fortschritt zurücksetzen
+          </button>
         </div>
       )}
 
@@ -520,8 +545,8 @@ const App = () => {
   const [questionCount, setQuestionCount] = useState(0);
   const [activeQuestions, setActiveQuestions] = useState([]);
   
-  // Initialize Smart Learning Hook
-  const { progress, updateProgress, getWeightedQuestions, getWeakestQuestions } = useSmartLearning();
+  // Initialize Smart Learning Hook (Persistence handled inside)
+  const { progress, updateProgress, getWeightedQuestions, getWeakestQuestions, resetProgress } = useSmartLearning();
 
   const startQuiz = () => {
     // Get questions weighted by difficulty/history
@@ -550,7 +575,7 @@ const App = () => {
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setScreen('welcome')}>
             <SwissFlag size={28} className="drop-shadow-sm" />
-            <span className="font-bold text-xl tracking-tight hidden sm:block">Zürich <span className="text-red-600">Einbürgerung</span> Grundkenntnistest</span>
+            <span className="font-bold text-xl tracking-tight hidden sm:block">Zürich<span className="text-red-600">Einbürgerung</span></span>
           </div>
           <div className="flex items-center gap-4">
              {screen !== 'welcome' && (
@@ -569,6 +594,7 @@ const App = () => {
             onStart={startQuiz} 
             onStartFlashcards={startFlashcards} 
             progress={progress} 
+            onReset={resetProgress}
           />
         )}
         {screen === 'quiz' && (
