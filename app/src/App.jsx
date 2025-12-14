@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2 } from 'lucide-react';
+import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2, PlayCircle } from 'lucide-react';
 
 const SwissFlag = ({ size = 24, className = "" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"  width={size} height={size} className={className}>
@@ -215,7 +215,7 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl">
         <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={onStart}>
           <div className="flex flex-col items-center space-y-4">
             <div className="p-4 bg-red-50 rounded-full group-hover:bg-red-100 transition-colors">
@@ -255,6 +255,28 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
               }}
             >
               Karten Öffnen
+            </Button>
+          </div>
+        </Card>
+
+        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => window.open('https://www.youtube.com/playlist?list=PLg1iF-QfOu4_3pMJTx1noY9Hj939cBamq', '_blank', 'noopener') }>
+          <div className="flex flex-col items-center space-y-4">
+            <div className="p-4 bg-amber-50 rounded-full group-hover:bg-amber-100 transition-colors">
+              <PlayCircle className="w-8 h-8 text-amber-600" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-800">Video Playlist</h3>
+            <p className="text-slate-500 text-sm text-center">
+              Erklärvideos zum Grundkenntnistest. Öffnet in YouTube und ist offline speicherbar.
+            </p>
+            <Button 
+              variant="secondary" 
+              className="w-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open('https://www.youtube.com/playlist?list=PLg1iF-QfOu4_3pMJTx1noY9Hj939cBamq', '_blank', 'noopener');
+              }}
+            >
+              Videos ansehen
             </Button>
           </div>
         </Card>
