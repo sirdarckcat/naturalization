@@ -988,18 +988,19 @@
             {
               "id": 55,
               "question_de": "Welche ist die Schweizer Nationalfahne?",
-              "question_en": "Which is the Swiss national flag? ",
+              "question_en": "Which is the Swiss national flag?",
+              "options_html": true,
               "options_de": [
-                "a) [Flagge Dänemark]",
-                "b) [Rotes Kreuz]",
-                "c) [Schweizer Flagge]",
-                "d) [Keine Option d in Quelle]"
+                "a) <img src=3.png>",
+                "b) <img src=5.png>",
+                "c) <img src=7.png>",
+                "d) <img src=9.png>"
               ],
               "options_en": [
-                "a) [Flag of Denmark]",
-                "b) [Red Cross]",
-                "c) [Swiss Flag]",
-                "d) [No option d in source]"
+                "a) <img src=3.png>",
+                "b) <img src=5.png>",
+                "c) <img src=7.png>",
+                "d) <img src=9.png>"
               ],
               "correct_answer_key": "c"
             },
@@ -1986,17 +1987,18 @@
               "id": 110,
               "question_de": "Welches ist das Wappen des Kantons Zürich?",
               "question_en": "Which is the coat of arms of the Canton of Zurich? ",
+              "options_html": true,
               "options_de": [
-                "a) [Wappen 1]",
-                "b) [Wappen 2]",
-                "c) [Wappen 3]",
-                "d) [Wappen 4]"
+                "a) <img src=10.png>",
+                "b) <img src=11.png>",
+                "c) <img src=12.png>",
+                "d) <img src=13.png>"
               ],
               "options_en": [
-                "a) [Coat of arms 1]",
-                "b) [Coat of arms 2]",
-                "c) [Coat of arms 3]",
-                "d) [Coat of arms 4]"
+                "a) <img src=10.png>",
+                "b) <img src=11.png>",
+                "c) <img src=12.png>",
+                "d) <img src=13.png>"
               ],
               "correct_answer_key": "c"
             },
@@ -4175,8 +4177,9 @@
             },
             {
               "id": 229,
-              "question_de": "Von welcher antiken Herrschaft und Kultur stammt das hier abgebildete Amphitheater (in Avenches)?",
-              "question_en": "From which ancient dominion and culture does the amphitheatre pictured here (in Avenches) originate?  [Image of a Roman amphitheatre]",
+              "question_html": true,
+              "question_de": "Von welcher antiken Herrschaft und Kultur stammt das hier abgebildete Amphitheater (in Avenches)? <img src=14.png>",
+              "question_en": "From which ancient dominion and culture does the amphitheatre pictured here (in Avenches) originate? <img src=14.png>",
               "options_de": [
                 "a) von den Galliern",
                 "b) von den Römern",
@@ -5096,8 +5099,9 @@
             },
             {
               "id": 279,
-              "question_de": "Wie heisst dieser Berg?",
-              "question_en": "What is the name of this mountain? ",
+              "question_html": true,
+              "question_de": "Wie heisst dieser Berg? <img src=15.png>",
+              "question_en": "What is the name of this mountain? <img src=15.png>",
               "options_de": [
                 "a) Finsteraarhorn",
                 "b) Eiger",
@@ -5284,18 +5288,19 @@
             {
               "id": 289,
               "question_de": "Wo liegt der Kanton Zürich?",
-              "question_en": "Where is the Canton of Zurich located? ",
+              "question_en": "Where is the Canton of Zurich located?",
+              "options_html": true,
               "options_de": [
-                "a) [Karte 1: Waadt/Genf]",
-                "b) [Karte 2: Zürich]",
-                "c) [Karte 3: Aargau]",
-                "d) [Karte 4: Tessin/Graubünden]"
+                "a) <img src=17.png>",
+                "b) <img src=19.png>",
+                "c) <img src=21.png>",
+                "d) <img src=23.png>"
               ],
               "options_en": [
-                "a) [Map 1: Vaud/Geneva]",
-                "b) [Map 2: Zurich]",
-                "c) [Map 3: Aargau]",
-                "d) [Map 4: Ticino/Graubünden]"
+                "a) <img src=17.png>",
+                "b) <img src=19.png>",
+                "c) <img src=21.png>",
+                "d) <img src=23.png>"
               ],
               "correct_answer_key": "b"
             },

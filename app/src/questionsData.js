@@ -19,8 +19,10 @@ function transformQuestions(data) {
           level: subsection.title_de,
           question: q.question_de,
           questionEn: q.question_en,
+          questionHtml: !!q.question_html,
           options: cleanOptions(q.options_de),
           optionsEn: cleanOptions(q.options_en),
+          optionsHtml: !!q.options_html,
           correct: correctIndex
         });
       });

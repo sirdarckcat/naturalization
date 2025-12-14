@@ -11,6 +11,14 @@ const SwissFlag = ({ size = 24, className = "" }) => (
 
 import { QUESTIONS_DATA } from './questionsData';
 
+// Utility to render plain text or trusted HTML snippets (used for image-based questions/options)
+const ContentBlock = ({ content, isHtml = false, className = "", as: Tag = 'span' }) => {
+  if (isHtml) {
+    return <Tag className={className} dangerouslySetInnerHTML={{ __html: content }} />;
+  }
+  return <Tag className={className}>{content}</Tag>;
+};
+
 
 // --- COMPONENTS ---
 
@@ -310,9 +318,12 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
               {currentQuestion.level}
             </span>
           </div>
-          <h2 className="text-2xl font-bold text-slate-800 leading-snug min-h-[4rem]">
-            {displayQuestion}
-          </h2>
+          <ContentBlock
+            as="h2"
+            content={displayQuestion}
+            isHtml={currentQuestion.questionHtml}
+            className={`text-2xl font-bold text-slate-800 leading-snug min-h-[4rem] ${currentQuestion.questionHtml ? 'question-html' : ''}`}
+          />
         </div>
 
         <div className="space-y-3">
@@ -330,13 +341,17 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
                 key={idx}
                 onClick={() => handleOptionClick(idx)}
                 disabled={isAnswered}
-                className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 flex justify-between items-center group
+                className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 flex justify-between items-center group min-h-[80px] ${currentQuestion.optionsHtml ? 'option-button-html' : ''}
                   ${variant === 'neutral' ? 'border-slate-200 hover:border-red-300 hover:bg-red-50' : ''}
                   ${variant === 'correct' ? 'border-green-500 bg-green-50 text-green-900' : ''}
                   ${variant === 'incorrect' ? 'border-red-500 bg-red-50 text-red-900 opacity-60' : ''}
                 `}
               >
-                <span className="font-medium text-lg">{option}</span>
+                <ContentBlock
+                  content={option}
+                  isHtml={currentQuestion.optionsHtml}
+                  className={`font-medium text-lg ${currentQuestion.optionsHtml ? 'option-html' : ''}`}
+                />
                 {variant === 'correct' && <CheckCircle className="text-green-600 shrink-0" />}
                 {variant === 'incorrect' && <XCircle className="text-red-600 shrink-0" />}
               </button>
@@ -451,8 +466,15 @@ const FlashcardScreen = ({ questions, weakestQuestions, onExit }) => {
                 <span className="px-2 py-1 bg-slate-100 rounded text-xs text-slate-500 font-bold uppercase">{currentQuestion.category}</span>
                 <span className="px-2 py-1 bg-red-50 rounded text-xs text-red-600 font-bold uppercase">{currentQuestion.level}</span>
                </div>
-               <h3 className="text-2xl font-bold text-slate-800 leading-relaxed">{displayQuestion}</h3>
-               <p className="mt-8 text-slate-400 text-sm animate-pulse">Klicken zum Umdrehen</p>
+               <div className="w-full max-h-[60vh] overflow-auto flex flex-col items-center gap-4 px-2">
+                 <ContentBlock
+                   as="h3"
+                   content={displayQuestion}
+                   isHtml={currentQuestion.questionHtml}
+                   className={`text-2xl font-bold text-slate-800 leading-relaxed ${currentQuestion.questionHtml ? 'question-html card-html' : ''}`}
+                 />
+                 <p className="text-slate-400 text-sm animate-pulse">Klicken zum Umdrehen</p>
+               </div>
             </Card>
           </div>
 
@@ -460,9 +482,14 @@ const FlashcardScreen = ({ questions, weakestQuestions, onExit }) => {
           <div className="absolute w-full h-full backface-hidden rotate-y-180">
             <Card className="h-full flex flex-col justify-center items-center p-8 text-center bg-red-50 border-b-4 border-b-red-600">
               <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Richtige Antwort</h3>
-              <p className="text-2xl font-medium text-red-900 leading-relaxed">
-                {displayAnswer}
-              </p>
+              <div className="w-full max-h-[60vh] overflow-auto flex items-center justify-center px-2">
+                <ContentBlock
+                  as="p"
+                  content={displayAnswer}
+                  isHtml={currentQuestion.optionsHtml}
+                  className={`text-2xl font-medium text-red-900 leading-relaxed text-center ${currentQuestion.optionsHtml ? 'option-html card-html' : ''}`}
+                />
+              </div>
             </Card>
           </div>
 
