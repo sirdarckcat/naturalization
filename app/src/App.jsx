@@ -126,13 +126,22 @@ const useSmartLearning = () => {
     const weightedQuestions = allQuestions.map(q => {
       const stats = progress[q.id] || { correctCount: 0, incorrectCount: 0, lastResult: null };
       
-      let weight = 1;
-      if (stats.lastResult === 'incorrect') weight += 2;
-      weight += stats.incorrectCount * 1;
-      if (stats.lastResult === null) weight += 0.5; // Slightly prefer new questions
-      weight -= stats.correctCount * 0.8;
+      const b = 4.2;
+      const alpha = 4.4;
+      const beta = 1.5;
+      const gamma = -2.0;
+      const delta = 1.4;
+      const epsilon = 0.004;
+
+      let weight = b;
+      if (stats.lastResult === 'incorrect') weight += alpha;
+      weight += beta * Math.min(stats.incorrectCount, 6); // Cap penalty
+      if (stats.lastResult === null) weight += gamma;     // Deprioritize unseen
+      weight -= delta * stats.correctCount;
+
+      weight = Math.max(epsilon, weight);
       
-      return { ...q, weight: Math.max(0.1, weight) };
+      return { ...q, weight };
     });
 
     // Weighted random selection
