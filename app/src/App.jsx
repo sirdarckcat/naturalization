@@ -1,11 +1,32 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2 } from 'lucide-react';
 
-// --- CUSTOM SWISS FLAG COMPONENT ---
 const SwissFlag = ({ size = 24, className = "" }) => (
-  <svg width={size} height={size} viewBox="0 0 32 32" className={className} xmlns="http://www.w3.org/2000/svg">
-    <rect width="32" height="32" rx="4" fill="#DC2626" />
-    <path d="M13 6H19V13H26V19H19V26H13V19H6V13H13V6Z" fill="white" />
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"  width={size} height={size} className={className}>
+    <defs>
+      <color id="zurichBlue" value="#0055A5"/>
+      <color id="swissRed" value="#D52B1E"/>
+    </defs>
+
+    <g clip-path="url(#roundCorner)">
+      <defs>
+        <clipPath id="roundCorner">
+          <rect x="0" y="0" width="64" height="64" rx="12" ry="12"/>
+        </clipPath>
+      </defs>
+
+      <rect x="0" y="0" width="64" height="64" fill="#ffffff"/>
+      <polygon points="0,64 64,64 64,0" fill="#0055A5"/>
+    </g>
+
+    <circle cx="32" cy="32" r="20" fill="#D52B1E"/>
+
+    <path d="M22 32 L29 39 L42 24" 
+          fill="none" 
+          stroke="#ffffff" 
+          stroke-width="5" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
   </svg>
 );
 
@@ -162,7 +183,7 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 space-y-8 animate-fade-in">
       <div className="space-y-4 max-w-2xl">
-        <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
           <SwissFlag size={64} />
         </div>
         <h1 className="text-4xl font-bold text-slate-800">Grundkenntnistest Zürich</h1>
