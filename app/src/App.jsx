@@ -300,31 +300,20 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [showTranslate, setShowTranslate] = useState(false);
-  // Generate a random seed once when quiz starts to make shuffling deterministic but unique per session
-  const [sessionSeed] = useState(() => Math.random());
-
   const currentQuestion = questions[currentIndex];
 
-  // Shuffle options for the current question using a seeded random function
+  // Shuffle options for the current question
   const shuffledIndices = useMemo(() => {
     const numOptions = (showTranslate ? currentQuestion.optionsEn : currentQuestion.options).length;
     const indices = Array.from({ length: numOptions }, (_, i) => i);
     
-    // Seeded pseudo-random function using sin-based distribution
-    // The large multiplier (43758.5453123) helps distribute values more uniformly
-    const seededRandom = (seed) => {
-      const x = Math.sin(seed) * 43758.5453123;
-      return x - Math.floor(x);
-    };
-    
-    // Fisher-Yates shuffle with seeded random
+    // Fisher-Yates shuffle using Math.random()
     for (let i = indices.length - 1; i > 0; i--) {
-      const seed = sessionSeed * 10000 + currentQuestion.id * 100 + i;
-      const j = Math.floor(seededRandom(seed) * (i + 1));
+      const j = Math.floor(Math.random() * (i + 1));
       [indices[i], indices[j]] = [indices[j], indices[i]];
     }
     return indices;
-  }, [currentQuestion.id, sessionSeed, showTranslate, currentQuestion.options, currentQuestion.optionsEn]);
+  }, [currentIndex, currentQuestion.id]);
 
   const handleOptionClick = (shuffledIndex) => {
     if (isAnswered) return;
