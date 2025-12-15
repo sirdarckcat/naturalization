@@ -307,9 +307,11 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
 
   // Shuffle options for the current question using a seeded random function
   const shuffledIndices = useMemo(() => {
-    const indices = [0, 1, 2, 3];
+    const numOptions = (showTranslate ? currentQuestion.optionsEn : currentQuestion.options).length;
+    const indices = Array.from({ length: numOptions }, (_, i) => i);
     
-    // Seeded pseudo-random function
+    // Seeded pseudo-random function using sin-based distribution
+    // The large multiplier (43758.5453123) helps distribute values more uniformly
     const seededRandom = (seed) => {
       const x = Math.sin(seed) * 43758.5453123;
       return x - Math.floor(x);
@@ -317,12 +319,12 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
     
     // Fisher-Yates shuffle with seeded random
     for (let i = indices.length - 1; i > 0; i--) {
-      const seed = sessionSeed + currentQuestion.id + i;
+      const seed = sessionSeed * 10000 + currentQuestion.id * 100 + i;
       const j = Math.floor(seededRandom(seed) * (i + 1));
       [indices[i], indices[j]] = [indices[j], indices[i]];
     }
     return indices;
-  }, [currentIndex, currentQuestion.id, sessionSeed]);
+  }, [currentQuestion.id, sessionSeed, showTranslate, currentQuestion.options, currentQuestion.optionsEn]);
 
   const handleOptionClick = (shuffledIndex) => {
     if (isAnswered) return;
