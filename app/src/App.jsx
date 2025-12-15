@@ -300,15 +300,38 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [showTranslate, setShowTranslate] = useState(false);
+  // Generate a random seed once when quiz starts to make shuffling deterministic but unique per session
+  const [sessionSeed] = useState(() => Math.random());
 
   const currentQuestion = questions[currentIndex];
 
-  const handleOptionClick = (index) => {
+  // Shuffle options for the current question using a seeded random function
+  const shuffledIndices = useMemo(() => {
+    const indices = [0, 1, 2, 3];
+    
+    // Seeded pseudo-random function
+    const seededRandom = (seed) => {
+      const x = Math.sin(seed) * 43758.5453123;
+      return x - Math.floor(x);
+    };
+    
+    // Fisher-Yates shuffle with seeded random
+    for (let i = indices.length - 1; i > 0; i--) {
+      const seed = sessionSeed + currentQuestion.id + i;
+      const j = Math.floor(seededRandom(seed) * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return indices;
+  }, [currentIndex, currentQuestion.id, sessionSeed]);
+
+  const handleOptionClick = (shuffledIndex) => {
     if (isAnswered) return;
-    setSelectedOption(index);
+    setSelectedOption(shuffledIndex);
     setIsAnswered(true);
     
-    const isCorrect = index === currentQuestion.correct;
+    // Map shuffled index back to original index to check correctness
+    const originalIndex = shuffledIndices[shuffledIndex];
+    const isCorrect = originalIndex === currentQuestion.correct;
     if (isCorrect) {
       setScore(score + 1);
     }
@@ -332,6 +355,9 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
 
   const displayQuestion = showTranslate ? currentQuestion.questionEn : currentQuestion.question;
   const displayOptions = showTranslate ? currentQuestion.optionsEn : currentQuestion.options;
+  
+  // Create shuffled options array
+  const shuffledOptions = shuffledIndices.map(originalIdx => displayOptions[originalIdx]);
 
   return (
     <div className="max-w-3xl mx-auto w-full px-4 py-6 space-y-6">
@@ -379,19 +405,21 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
         </div>
 
         <div className="space-y-3">
-          {displayOptions.map((option, idx) => {
+          {shuffledOptions.map((option, shuffledIdx) => {
             let variant = "neutral";
             if (isAnswered) {
-              if (idx === currentQuestion.correct) variant = "correct";
-              else if (idx === selectedOption) variant = "incorrect";
-            } else if (idx === selectedOption) {
+              // Check if this shuffled position contains the correct answer
+              const originalIdx = shuffledIndices[shuffledIdx];
+              if (originalIdx === currentQuestion.correct) variant = "correct";
+              else if (shuffledIdx === selectedOption) variant = "incorrect";
+            } else if (shuffledIdx === selectedOption) {
               variant = "outline";
             }
 
             return (
               <button
-                key={idx}
-                onClick={() => handleOptionClick(idx)}
+                key={shuffledIdx}
+                onClick={() => handleOptionClick(shuffledIdx)}
                 disabled={isAnswered}
                 className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 flex justify-between items-center group min-h-[80px] ${currentQuestion.optionsHtml ? 'option-button-html' : ''}
                   ${variant === 'neutral' ? 'border-slate-200 hover:border-red-300 hover:bg-red-50' : ''}
