@@ -422,7 +422,7 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
         <Modal title="Fragen Übersicht" onClose={() => setShowQuestionsModal(false)}>
           <div className="space-y-6">
             <p className="text-slate-600 text-center">
-              Ihre Lernfortschritt im Überblick
+              Ihr Lernfortschritt im Überblick
             </p>
             <PieChartComponent
               data={[
@@ -431,7 +431,7 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
                 { label: 'Verbleibend', value: remaining, color: '#e2e8f0' }
               ]}
               centerText={`${totalAnswered}`}
-              centerSubtext="von 350"
+              centerSubtext={`von ${QUESTIONS_DATA.length}`}
             />
             <div className="bg-slate-50 rounded-xl p-4 space-y-2 text-sm text-left">
               <div className="flex justify-between">
