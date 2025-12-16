@@ -191,6 +191,7 @@ const BarChartComponent = ({ correct, incorrect }) => {
   const total = correct + incorrect;
   const correctPercentage = total > 0 ? (correct / total) * 100 : 0;
   const incorrectPercentage = total > 0 ? (incorrect / total) * 100 : 0;
+  const MIN_PERCENTAGE_TO_SHOW_LABEL = 10; // Minimum width percentage to display label inside bar
   
   return (
     <div className="space-y-6">
@@ -207,7 +208,7 @@ const BarChartComponent = ({ correct, incorrect }) => {
               className="bg-green-500 h-full flex items-center justify-end pr-2 transition-all duration-500"
               style={{ width: `${correctPercentage}%` }}
             >
-              {correctPercentage > 10 && <span className="text-xs font-bold text-white">{Math.round(correctPercentage)}%</span>}
+              {correctPercentage > MIN_PERCENTAGE_TO_SHOW_LABEL && <span className="text-xs font-bold text-white">{Math.round(correctPercentage)}%</span>}
             </div>
           </div>
         </div>
@@ -224,7 +225,7 @@ const BarChartComponent = ({ correct, incorrect }) => {
               className="bg-red-500 h-full flex items-center justify-end pr-2 transition-all duration-500"
               style={{ width: `${incorrectPercentage}%` }}
             >
-              {incorrectPercentage > 10 && <span className="text-xs font-bold text-white">{Math.round(incorrectPercentage)}%</span>}
+              {incorrectPercentage > MIN_PERCENTAGE_TO_SHOW_LABEL && <span className="text-xs font-bold text-white">{Math.round(incorrectPercentage)}%</span>}
             </div>
           </div>
         </div>
