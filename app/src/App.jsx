@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2, PlayCircle } from 'lucide-react';
+import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2, PlayCircle, X, PieChart, BarChart3 } from 'lucide-react';
 
 const SwissFlag = ({ size = 24, className = "" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"  width={size} height={size} className={className}>
@@ -8,7 +8,7 @@ const SwissFlag = ({ size = 24, className = "" }) => (
       <color id="swissRed" value="#D52B1E"/>
     </defs>
 
-    <g clip-path="url(#roundCorner)">
+    <g clipPath="url(#roundCorner)">
       <defs>
         <clipPath id="roundCorner">
           <rect x="0" y="0" width="64" height="64" rx="12" ry="12"/>
@@ -24,9 +24,9 @@ const SwissFlag = ({ size = 24, className = "" }) => (
     <path d="M22 32 L29 39 L42 24" 
           fill="none" 
           stroke="#ffffff" 
-          stroke-width="5" 
-          stroke-linecap="round" 
-          stroke-linejoin="round"/>
+          strokeWidth="5" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"/>
   </svg>
 );
 
@@ -73,6 +73,181 @@ const Button = ({ children, onClick, variant = "primary", className = "", disabl
       {Icon && <Icon size={18} />}
       {children}
     </button>
+  );
+};
+
+const Modal = ({ children, onClose, title }) => (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in" onClick={onClose}>
+    <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-slate-800">{title}</h2>
+        <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+          <X size={24} />
+        </button>
+      </div>
+      <div className="p-6">
+        {children}
+      </div>
+    </div>
+  </div>
+);
+
+const PieChartComponent = ({ data, centerText, centerSubtext }) => {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  
+  if (total === 0) {
+    return (
+      <div className="flex items-center justify-center h-64 text-slate-400">
+        <p>Keine Daten verfügbar</p>
+      </div>
+    );
+  }
+  
+  const radius = 80;
+  const centerX = 100;
+  const centerY = 100;
+  const innerRadius = 50; // For donut chart
+  
+  // Calculate cumulative angles to avoid mutation
+  const cumulativeAngles = data.reduce((acc, item) => {
+    const lastAngle = acc.length > 0 ? acc[acc.length - 1] : -90;
+    const angle = (item.value / total) * 360;
+    acc.push(lastAngle + angle);
+    return acc;
+  }, []);
+  
+  const paths = data.map((item, index) => {
+    const angle = (item.value / total) * 360;
+    const startAngle = index === 0 ? -90 : cumulativeAngles[index - 1];
+    const endAngle = cumulativeAngles[index];
+    
+    // Convert angles to radians
+    const startRad = (startAngle * Math.PI) / 180;
+    const endRad = (endAngle * Math.PI) / 180;
+    
+    // Calculate outer arc points
+    const x1 = centerX + radius * Math.cos(startRad);
+    const y1 = centerY + radius * Math.sin(startRad);
+    const x2 = centerX + radius * Math.cos(endRad);
+    const y2 = centerY + radius * Math.sin(endRad);
+    
+    // Calculate inner arc points
+    const x3 = centerX + innerRadius * Math.cos(endRad);
+    const y3 = centerY + innerRadius * Math.sin(endRad);
+    const x4 = centerX + innerRadius * Math.cos(startRad);
+    const y4 = centerY + innerRadius * Math.sin(startRad);
+    
+    const largeArcFlag = angle > 180 ? 1 : 0;
+    
+    const pathData = [
+      `M ${x1} ${y1}`,
+      `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+      `L ${x3} ${y3}`,
+      `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x4} ${y4}`,
+      'Z'
+    ].join(' ');
+    
+    return (
+      <g key={index}>
+        <path d={pathData} fill={item.color} className="transition-opacity hover:opacity-80" />
+      </g>
+    );
+  });
+  
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <div className="relative">
+        <svg viewBox="0 0 200 200" className="w-64 h-64">
+          {paths}
+          {centerText && (
+            <g>
+              <text x="100" y="95" textAnchor="middle" className="text-3xl font-bold fill-slate-800">
+                {centerText}
+              </text>
+              {centerSubtext && (
+                <text x="100" y="115" textAnchor="middle" className="text-sm fill-slate-500">
+                  {centerSubtext}
+                </text>
+              )}
+            </g>
+          )}
+        </svg>
+      </div>
+      <div className="flex flex-wrap gap-4 justify-center">
+        {data.map((item, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }}></div>
+            <span className="text-sm text-slate-700">
+              <span className="font-semibold">{item.label}:</span> {item.value} ({Math.round((item.value / total) * 100)}%)
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const BarChartComponent = ({ correct, incorrect }) => {
+  const total = correct + incorrect;
+  const correctPercentage = total > 0 ? (correct / total) * 100 : 0;
+  const incorrectPercentage = total > 0 ? (incorrect / total) * 100 : 0;
+  
+  return (
+    <div className="space-y-6">
+      <div className="bg-slate-50 rounded-xl p-6 space-y-4">
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-semibold text-green-700 flex items-center gap-2">
+              <CheckCircle size={16} /> Richtige Antworten
+            </span>
+            <span className="text-lg font-bold text-green-700">{correct}</span>
+          </div>
+          <div className="w-full bg-slate-200 rounded-full h-8 overflow-hidden">
+            <div 
+              className="bg-green-500 h-full flex items-center justify-end pr-2 transition-all duration-500"
+              style={{ width: `${correctPercentage}%` }}
+            >
+              {correctPercentage > 10 && <span className="text-xs font-bold text-white">{Math.round(correctPercentage)}%</span>}
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-semibold text-red-700 flex items-center gap-2">
+              <XCircle size={16} /> Falsche Antworten
+            </span>
+            <span className="text-lg font-bold text-red-700">{incorrect}</span>
+          </div>
+          <div className="w-full bg-slate-200 rounded-full h-8 overflow-hidden">
+            <div 
+              className="bg-red-500 h-full flex items-center justify-end pr-2 transition-all duration-500"
+              style={{ width: `${incorrectPercentage}%` }}
+            >
+              {incorrectPercentage > 10 && <span className="text-xs font-bold text-white">{Math.round(incorrectPercentage)}%</span>}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="bg-white border-2 border-slate-200 rounded-xl p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-bold text-slate-800">Erfolgsquote Berechnung</h3>
+          <div className={`text-3xl font-bold ${correctPercentage >= 80 ? 'text-green-600' : correctPercentage >= 60 ? 'text-amber-600' : 'text-red-600'}`}>
+            {Math.round(correctPercentage)}%
+          </div>
+        </div>
+        <div className="text-sm text-slate-600 space-y-2">
+          <p>Die Erfolgsquote wird wie folgt berechnet:</p>
+          <div className="bg-slate-50 p-4 rounded-lg font-mono text-xs">
+            <div>Erfolgsquote = (Richtige Antworten ÷ Gesamt Versuche) × 100</div>
+            <div className="mt-2 text-slate-800 font-semibold">
+              = ({correct} ÷ {total}) × 100 = {Math.round(correctPercentage)}%
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -184,10 +359,18 @@ const useSmartLearning = () => {
 // --- SCREENS ---
 
 const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
+  const [showQuestionsModal, setShowQuestionsModal] = useState(false);
+  const [showSuccessRateModal, setShowSuccessRateModal] = useState(false);
+  
   const totalAnswered = Object.keys(progress).length;
   const correctAnswers = Object.values(progress).reduce((sum, p) => sum + p.correctCount, 0);
   const totalAttempts = Object.values(progress).reduce((sum, p) => sum + p.correctCount + p.incorrectCount, 0);
+  const incorrectAnswers = totalAttempts - correctAnswers;
   const masteryRate = totalAttempts > 0 ? Math.round((correctAnswers / totalAttempts) * 100) : 0;
+  
+  // Calculate mastered questions (more correct than incorrect)
+  const masteredCount = Object.values(progress).filter(p => p.correctCount > p.incorrectCount).length;
+  const remaining = QUESTIONS_DATA.length - totalAnswered;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 space-y-8 animate-fade-in">
@@ -205,14 +388,24 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
       {totalAnswered > 0 && (
         <div className="w-full max-w-md">
           <div className="flex gap-6 justify-center w-full bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-slate-800">{totalAnswered}</div>
-              <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">Fragen gesehen</div>
+            <div 
+              className="text-center cursor-pointer hover:bg-slate-50 rounded-lg p-2 transition-colors group"
+              onClick={() => setShowQuestionsModal(true)}
+            >
+              <div className="text-2xl font-bold text-slate-800 group-hover:text-red-600 transition-colors">{totalAnswered}</div>
+              <div className="text-xs text-slate-500 uppercase font-bold tracking-wider flex items-center gap-1 justify-center">
+                <PieChart size={12} /> Fragen gesehen
+              </div>
             </div>
             <div className="w-px bg-slate-200"></div>
-            <div className="text-center">
-              <div className={`text-2xl font-bold ${masteryRate >= 80 ? 'text-green-600' : 'text-slate-800'}`}>{masteryRate}%</div>
-              <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">Erfolgsquote</div>
+            <div 
+              className="text-center cursor-pointer hover:bg-slate-50 rounded-lg p-2 transition-colors group"
+              onClick={() => setShowSuccessRateModal(true)}
+            >
+              <div className={`text-2xl font-bold ${masteryRate >= 80 ? 'text-green-600' : 'text-slate-800'} group-hover:text-red-600 transition-colors`}>{masteryRate}%</div>
+              <div className="text-xs text-slate-500 uppercase font-bold tracking-wider flex items-center gap-1 justify-center">
+                <BarChart3 size={12} /> Erfolgsquote
+              </div>
             </div>
           </div>
           <button 
@@ -222,6 +415,55 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
             <Trash2 size={12} /> Fortschritt zurücksetzen
           </button>
         </div>
+      )}
+
+      {/* Questions Seen Modal */}
+      {showQuestionsModal && (
+        <Modal title="Fragen Übersicht" onClose={() => setShowQuestionsModal(false)}>
+          <div className="space-y-6">
+            <p className="text-slate-600 text-center">
+              Ihre Lernfortschritt im Überblick
+            </p>
+            <PieChartComponent
+              data={[
+                { label: 'Gemeistert', value: masteredCount, color: '#10b981' },
+                { label: 'Gesehen', value: totalAnswered - masteredCount, color: '#f59e0b' },
+                { label: 'Verbleibend', value: remaining, color: '#e2e8f0' }
+              ]}
+              centerText={`${totalAnswered}`}
+              centerSubtext="von 350"
+            />
+            <div className="bg-slate-50 rounded-xl p-4 space-y-2 text-sm text-left">
+              <div className="flex justify-between">
+                <span className="text-slate-600 flex items-center gap-2">
+                  <CheckCircle size={16} className="text-green-600" /> Gemeistert
+                </span>
+                <span className="font-semibold">{masteredCount} Fragen</span>
+              </div>
+              <p className="text-xs text-slate-500 ml-6">Fragen mit mehr richtigen als falschen Antworten</p>
+              <div className="flex justify-between mt-2">
+                <span className="text-slate-600">📚 Gesehen (noch nicht gemeistert)</span>
+                <span className="font-semibold">{totalAnswered - masteredCount} Fragen</span>
+              </div>
+              <div className="flex justify-between mt-2">
+                <span className="text-slate-600">⏳ Verbleibend</span>
+                <span className="font-semibold">{remaining} Fragen</span>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Success Rate Modal */}
+      {showSuccessRateModal && (
+        <Modal title="Erfolgsquote Details" onClose={() => setShowSuccessRateModal(false)}>
+          <div className="space-y-6">
+            <p className="text-slate-600 text-center">
+              Verstehen Sie, wie Ihre Erfolgsquote berechnet wird
+            </p>
+            <BarChartComponent correct={correctAnswers} incorrect={incorrectAnswers} />
+          </div>
+        </Modal>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl">
