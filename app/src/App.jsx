@@ -553,15 +553,15 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
     
     // Seeded random shuffle using question ID for deterministic but varied shuffling
     const seed = currentQuestion.id;
-    let random = seed;
-    const seededRandom = () => {
-      random = (random * 9301 + 49297) % 233280;
-      return random / 233280;
+    const seededRandom = (index) => {
+      // Linear congruential generator with seed and index
+      const x = (seed + index) * 9301 + 49297;
+      return (x % 233280) / 233280;
     };
     
     // Fisher-Yates shuffle using seeded random
     for (let i = indices.length - 1; i > 0; i--) {
-      const j = Math.floor(seededRandom() * (i + 1));
+      const j = Math.floor(seededRandom(i) * (i + 1));
       [indices[i], indices[j]] = [indices[j], indices[i]];
     }
     return indices;
