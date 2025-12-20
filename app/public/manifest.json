@@ -1,12 +1,16 @@
 {
   "name": "Grundkenntnistest Zürich",
   "short_name": "GK Zürich",
-  "description": "Vorbereitung auf den Grundkenntnistest Zürich für die Einbürgerung",
+  "description": "Vorbereitung auf den Grundkenntnistest Zürich für die Einbürgerung. Intelligentes Quiz-System mit Lernkarten, Statistiken und Offline-Unterstützung.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#DC2626",
   "orientation": "portrait-primary",
+  "categories": ["education", "reference"],
+  "lang": "de-CH",
+  "dir": "ltr",
+  "scope": "/",
   "icons": [
     {
       "src": "/icon-192x192.png",
@@ -25,6 +29,55 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-home.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Startbildschirm mit Quiz- und Lernoptionen"
+    },
+    {
+      "src": "/screenshot-quiz.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Intelligentes Quiz mit mehreren Antwortmöglichkeiten"
+    },
+    {
+      "src": "/screenshot-flashcards.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Interaktive Lernkarten zum Lernen"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Smart Quiz starten",
+      "short_name": "Quiz",
+      "description": "Starte ein intelligentes Quiz mit 15 Fragen",
+      "url": "/?mode=quiz",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Lernkarten öffnen",
+      "short_name": "Karten",
+      "description": "Öffne die interaktiven Lernkarten",
+      "url": "/?mode=flashcards",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
