@@ -897,6 +897,12 @@ const App = () => {
   const [score, setScore] = useState(0);
   const [questionCount, setQuestionCount] = useState(0);
   const [activeQuestions, setActiveQuestions] = useState([]);
+  
+  // Check if app is already installed
+  const isAlreadyInstalled = () => {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  };
+  
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   
@@ -906,7 +912,10 @@ const App = () => {
   // Listen for install events
   useEffect(() => {
     const handleAppInstallable = () => {
-      setIsInstallable(true);
+      // Only show install button if not already installed
+      if (!isAlreadyInstalled()) {
+        setIsInstallable(true);
+      }
     };
 
     const handleAppInstalled = () => {
@@ -918,11 +927,6 @@ const App = () => {
 
     window.addEventListener('appinstallable', handleAppInstallable);
     window.addEventListener('appinstalled', handleAppInstalled);
-
-    // Check if already installed (standalone mode or already displayed)
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-      setIsInstallable(false);
-    }
 
     return () => {
       window.removeEventListener('appinstallable', handleAppInstallable);
