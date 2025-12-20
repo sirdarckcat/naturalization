@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2, PlayCircle, X, PieChart, BarChart3 } from 'lucide-react';
+import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2, PlayCircle, X, PieChart, BarChart3, Download } from 'lucide-react';
 
 const SwissFlag = ({ size = 24, className = "" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"  width={size} height={size} className={className}>
@@ -892,14 +892,52 @@ const ResultScreen = ({ score, total, onRestart, onHome }) => {
 
 // --- APP CONTAINER ---
 
+// Check if app is already installed
+const isAlreadyInstalled = () => {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+};
+
 const App = () => {
   const [screen, setScreen] = useState('welcome'); // welcome, quiz, flashcards, results
   const [score, setScore] = useState(0);
   const [questionCount, setQuestionCount] = useState(0);
   const [activeQuestions, setActiveQuestions] = useState([]);
+  const [isInstallable, setIsInstallable] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
   
   // Initialize Smart Learning Hook (Persistence handled inside)
   const { progress, updateProgress, getWeightedQuestions, getWeakestQuestions, resetProgress } = useSmartLearning();
+
+  // Listen for install events
+  useEffect(() => {
+    const handleAppInstallable = () => {
+      // Only show install button if not already installed
+      if (!isAlreadyInstalled()) {
+        setIsInstallable(true);
+      }
+    };
+
+    const handleAppInstalled = () => {
+      setIsInstallable(false);
+      setIsInstalled(true);
+      // Show a success message briefly
+      setTimeout(() => setIsInstalled(false), 3000);
+    };
+
+    window.addEventListener('appinstallable', handleAppInstallable);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('appinstallable', handleAppInstallable);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (window.showInstallPrompt) {
+      await window.showInstallPrompt();
+    }
+  };
 
   const startQuiz = () => {
     // Get questions weighted by difficulty/history
@@ -935,6 +973,22 @@ const App = () => {
                <span className="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full uppercase tracking-wider">
                   {screen === 'quiz' ? 'Prüfung' : screen === 'flashcards' ? 'Training' : 'Ergebnis'}
                </span>
+             )}
+             {isInstallable && (
+               <button
+                 onClick={handleInstallClick}
+                 className="flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors text-sm shadow-md"
+                 title="App installieren"
+               >
+                 <Download size={16} />
+                 <span className="hidden sm:inline">Installieren</span>
+               </button>
+             )}
+             {isInstalled && (
+               <div className="flex items-center gap-2 bg-green-100 text-green-800 px-3 py-2 rounded-lg font-medium text-sm animate-fade-in">
+                 <CheckCircle size={16} />
+                 <span className="hidden sm:inline">Installiert!</span>
+               </div>
              )}
           </div>
         </div>

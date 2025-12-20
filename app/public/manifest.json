@@ -1,12 +1,16 @@
 {
   "name": "Grundkenntnistest Zürich",
   "short_name": "GK Zürich",
-  "description": "Vorbereitung auf den Grundkenntnistest Zürich für die Einbürgerung",
+  "description": "Vorbereitung auf den Grundkenntnistest Zürich für die Einbürgerung. Intelligentes Quiz-System mit Lernkarten, Statistiken und Offline-Unterstützung.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#DC2626",
   "orientation": "portrait-primary",
+  "categories": ["education", "reference"],
+  "lang": "de-CH",
+  "dir": "ltr",
+  "scope": "/",
   "icons": [
     {
       "src": "/icon-192x192.png",
@@ -25,6 +29,50 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-home-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Startbildschirm mit Quiz- und Lernoptionen (Mobile)"
+    },
+    {
+      "src": "/screenshot-quiz-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Intelligentes Quiz mit mehreren Antwortmöglichkeiten (Mobile)"
+    },
+    {
+      "src": "/screenshot-flashcards-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Interaktive Lernkarten zum Lernen (Mobile)"
+    },
+    {
+      "src": "/screenshot-home-wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Startbildschirm mit Quiz- und Lernoptionen (Desktop)"
+    },
+    {
+      "src": "/screenshot-quiz-wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Intelligentes Quiz mit mehreren Antwortmöglichkeiten (Desktop)"
+    },
+    {
+      "src": "/screenshot-flashcards-wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Interaktive Lernkarten zum Lernen (Desktop)"
     }
   ]
 }
