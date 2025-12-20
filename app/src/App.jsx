@@ -544,6 +544,8 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [showTranslate, setShowTranslate] = useState(false);
+  // Generate a random session seed once when the quiz starts
+  const [sessionSeed] = useState(() => Math.floor(Math.random() * 1000000));
   const currentQuestion = questions[currentIndex];
 
   // Shuffle options for the current question
@@ -551,8 +553,8 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
     const numOptions = (showTranslate ? currentQuestion.optionsEn : currentQuestion.options).length;
     const indices = Array.from({ length: numOptions }, (_, i) => i);
     
-    // Seeded random shuffle using question ID for deterministic but varied shuffling
-    const seed = currentQuestion.id;
+    // Seeded random shuffle using session seed + question ID for varied shuffling per test
+    const seed = sessionSeed + currentQuestion.id;
     const seededRandom = (index) => {
       // Linear congruential generator with seed and index
       const x = (seed + index) * 9301 + 49297;
@@ -565,7 +567,7 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
       [indices[i], indices[j]] = [indices[j], indices[i]];
     }
     return indices;
-  }, [currentQuestion.id, currentQuestion.options, currentQuestion.optionsEn, showTranslate]);
+  }, [sessionSeed, currentQuestion.id, currentQuestion.options, currentQuestion.optionsEn, showTranslate]);
 
   const handleOptionClick = (shuffledIndex) => {
     if (isAnswered) return;
