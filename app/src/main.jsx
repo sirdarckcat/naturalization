@@ -7,7 +7,7 @@ import App from './App.jsx'
 // Register service worker for offline support
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/naturalization/sw.js').catch(() => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {
       // Silently fail if service worker registration fails
     });
   });
