@@ -33,51 +33,46 @@
   ],
   "screenshots": [
     {
-      "src": "/screenshot-home.png",
-      "sizes": "540x720",
+      "src": "/screenshot-home-mobile.png",
+      "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Startbildschirm mit Quiz- und Lernoptionen"
+      "label": "Startbildschirm mit Quiz- und Lernoptionen (Mobile)"
     },
     {
-      "src": "/screenshot-quiz.png",
-      "sizes": "540x720",
+      "src": "/screenshot-quiz-mobile.png",
+      "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Intelligentes Quiz mit mehreren Antwortmöglichkeiten"
+      "label": "Intelligentes Quiz mit mehreren Antwortmöglichkeiten (Mobile)"
     },
     {
-      "src": "/screenshot-flashcards.png",
-      "sizes": "540x720",
+      "src": "/screenshot-flashcards-mobile.png",
+      "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Interaktive Lernkarten zum Lernen"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Smart Quiz starten",
-      "short_name": "Quiz",
-      "description": "Starte ein intelligentes Quiz mit 15 Fragen",
-      "url": "/?mode=quiz",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "label": "Interaktive Lernkarten zum Lernen (Mobile)"
     },
     {
-      "name": "Lernkarten öffnen",
-      "short_name": "Karten",
-      "description": "Öffne die interaktiven Lernkarten",
-      "url": "/?mode=flashcards",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "src": "/screenshot-home-wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Startbildschirm mit Quiz- und Lernoptionen (Desktop)"
+    },
+    {
+      "src": "/screenshot-quiz-wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Intelligentes Quiz mit mehreren Antwortmöglichkeiten (Desktop)"
+    },
+    {
+      "src": "/screenshot-flashcards-wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Interaktive Lernkarten zum Lernen (Desktop)"
     }
   ]
 }
