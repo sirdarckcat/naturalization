@@ -892,17 +892,16 @@ const ResultScreen = ({ score, total, onRestart, onHome }) => {
 
 // --- APP CONTAINER ---
 
+// Check if app is already installed
+const isAlreadyInstalled = () => {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+};
+
 const App = () => {
   const [screen, setScreen] = useState('welcome'); // welcome, quiz, flashcards, results
   const [score, setScore] = useState(0);
   const [questionCount, setQuestionCount] = useState(0);
   const [activeQuestions, setActiveQuestions] = useState([]);
-  
-  // Check if app is already installed
-  const isAlreadyInstalled = () => {
-    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-  };
-  
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   
@@ -936,10 +935,7 @@ const App = () => {
 
   const handleInstallClick = async () => {
     if (window.showInstallPrompt) {
-      const accepted = await window.showInstallPrompt();
-      if (!accepted) {
-        setIsInstallable(true); // Keep showing the button if user declined
-      }
+      await window.showInstallPrompt();
     }
   };
 
