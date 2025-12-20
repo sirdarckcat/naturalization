@@ -2,14 +2,14 @@
   "name": "Grundkenntnistest Zürich",
   "short_name": "GK Zürich",
   "description": "Vorbereitung auf den Grundkenntnistest Zürich für die Einbürgerung",
-  "start_url": "/naturalization/",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#DC2626",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/naturalization/gktzh.svg",
+      "src": "/gktzh.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
