@@ -33,6 +33,7 @@ const SwissFlag = ({ size = 24, className = "" }) => (
 import { QUESTIONS_DATA } from './questionsData';
 
 // Utility to render plain text or trusted HTML snippets (used for image-based questions/options)
+// eslint-disable-next-line no-unused-vars
 const ContentBlock = ({ content, isHtml = false, className = "", as: Tag = 'span' }) => {
   if (isHtml) {
     return <Tag className={className} dangerouslySetInnerHTML={{ __html: content }} />;
@@ -550,13 +551,21 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
     const numOptions = (showTranslate ? currentQuestion.optionsEn : currentQuestion.options).length;
     const indices = Array.from({ length: numOptions }, (_, i) => i);
     
-    // Fisher-Yates shuffle using Math.random()
+    // Seeded random shuffle using question ID for deterministic but varied shuffling
+    const seed = currentQuestion.id;
+    let random = seed;
+    const seededRandom = () => {
+      random = (random * 9301 + 49297) % 233280;
+      return random / 233280;
+    };
+    
+    // Fisher-Yates shuffle using seeded random
     for (let i = indices.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(seededRandom() * (i + 1));
       [indices[i], indices[j]] = [indices[j], indices[i]];
     }
     return indices;
-  }, [currentIndex, currentQuestion.id]);
+  }, [currentQuestion.id, currentQuestion.options, currentQuestion.optionsEn, showTranslate]);
 
   const handleOptionClick = (shuffledIndex) => {
     if (isAnswered) return;
@@ -694,11 +703,12 @@ const FlashcardScreen = ({ questions, weakestQuestions, onExit }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showTranslate, setShowTranslate] = useState(false);
 
-  // Reset index when mode changes
-  useEffect(() => {
+  // Reset index when mode changes by handling it in the mode setter
+  const handleModeChange = (newMode) => {
+    setMode(newMode);
     setCurrentIndex(0);
     setIsFlipped(false);
-  }, [mode]);
+  };
 
   const handleNext = () => {
     setIsFlipped(false);
@@ -724,7 +734,7 @@ const FlashcardScreen = ({ questions, weakestQuestions, onExit }) => {
         <h2 className="text-2xl font-bold text-slate-800">Alles perfekt!</h2>
         <p className="text-slate-600 mb-6">Sie haben momentan keine "schwierigen" Fragen markiert. Super!</p>
         <div className="flex gap-4">
-          <Button onClick={() => setMode('all')}>Alle Karten anzeigen</Button>
+          <Button onClick={() => handleModeChange('all')}>Alle Karten anzeigen</Button>
           <Button variant="secondary" onClick={onExit}>Zurück</Button>
         </div>
       </div>
@@ -745,13 +755,13 @@ const FlashcardScreen = ({ questions, weakestQuestions, onExit }) => {
           {/* Mode Toggle */}
           <div className="bg-slate-100 p-1 rounded-lg flex text-sm font-medium">
             <button 
-              onClick={() => setMode('all')}
+              onClick={() => handleModeChange('all')}
               className={`px-3 py-1 rounded-md transition-colors ${mode === 'all' ? 'bg-white shadow text-slate-800' : 'text-slate-500'}`}
             >
               Alle
             </button>
             <button 
-              onClick={() => setMode('weak')}
+              onClick={() => handleModeChange('weak')}
               className={`px-3 py-1 rounded-md transition-colors flex items-center gap-1 ${mode === 'weak' ? 'bg-white shadow text-red-600' : 'text-slate-500'}`}
             >
               <Brain size={14} /> Fokus ({weakestQuestions.length})
