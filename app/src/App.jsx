@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2, PlayCircle, X, PieChart, BarChart3, Download } from 'lucide-react';
+import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2, PlayCircle, X, PieChart, BarChart3, Download, Share2, Sparkles } from 'lucide-react';
 
 // Analytics tracking utility
 const trackEvent = (eventName, eventParams = {}) => {
@@ -99,6 +99,127 @@ const Modal = ({ children, onClose, title }) => (
     </div>
   </div>
 );
+
+// Social Share Modal Component
+const SocialShareModal = ({ onClose, milestone }) => {
+  const shareText = milestone === 'perfect_score' 
+    ? `🎉 Ich habe gerade 15/15 richtig beim Grundkenntnistest Zürich geschafft! Perfekte Punktzahl! 🇨🇭 #Einbürgerung #GKTZürich`
+    : `🎓 Ich habe gerade 100% Abdeckung beim Grundkenntnistest Zürich erreicht! Alle Fragen beantwortet! 🇨🇭 #Einbürgerung #GKTZürich`;
+  
+  const shareUrl = 'https://gktzh.app/';
+  
+  const handleShare = (platform) => {
+    let url = '';
+    const encodedText = encodeURIComponent(shareText);
+    const encodedUrl = encodeURIComponent(shareUrl);
+    
+    switch(platform) {
+      case 'twitter':
+        url = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+        break;
+      case 'facebook':
+        url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+        break;
+      case 'linkedin':
+        url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+        break;
+      case 'whatsapp':
+        url = `https://wa.me/?text=${encodedText}%20${encodedUrl}`;
+        break;
+      default:
+        return;
+    }
+    
+    trackEvent('milestone_share', { 
+      milestone: milestone,
+      platform: platform 
+    });
+    
+    window.open(url, '_blank', 'width=600,height=400');
+  };
+  
+  const handleCopyLink = () => {
+    const textToCopy = `${shareText}\n${shareUrl}`;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      trackEvent('milestone_copy_link', { milestone: milestone });
+      alert('Text und Link kopiert!');
+    });
+  };
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in" onClick={onClose}>
+      <div className="bg-gradient-to-br from-red-50 to-white rounded-xl shadow-2xl max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+        <div className="p-8 text-center">
+          <div className="mb-6 flex justify-center">
+            <div className="bg-red-100 rounded-full p-4 animate-bounce">
+              <Sparkles className="w-12 h-12 text-red-600" />
+            </div>
+          </div>
+          
+          <h2 className="text-3xl font-bold text-slate-800 mb-3">
+            {milestone === 'perfect_score' ? '🎉 Perfekt!' : '🎓 Meilenstein erreicht!'}
+          </h2>
+          
+          <p className="text-lg text-slate-600 mb-6">
+            {milestone === 'perfect_score' 
+              ? 'Sie haben zum ersten Mal 15/15 richtig! Teilen Sie diesen Erfolg!'
+              : 'Sie haben alle Fragen gesehen! 100% Abdeckung erreicht!'}
+          </p>
+          
+          <div className="bg-slate-50 rounded-lg p-4 mb-6 text-sm text-slate-700">
+            {shareText}
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <button
+              onClick={() => handleShare('twitter')}
+              className="flex items-center justify-center gap-2 bg-[#1DA1F2] text-white px-4 py-3 rounded-lg font-medium hover:bg-[#1a8cd8] transition-colors"
+            >
+              <Share2 size={18} />
+              Twitter
+            </button>
+            <button
+              onClick={() => handleShare('facebook')}
+              className="flex items-center justify-center gap-2 bg-[#1877F2] text-white px-4 py-3 rounded-lg font-medium hover:bg-[#1664d8] transition-colors"
+            >
+              <Share2 size={18} />
+              Facebook
+            </button>
+            <button
+              onClick={() => handleShare('linkedin')}
+              className="flex items-center justify-center gap-2 bg-[#0A66C2] text-white px-4 py-3 rounded-lg font-medium hover:bg-[#094d92] transition-colors"
+            >
+              <Share2 size={18} />
+              LinkedIn
+            </button>
+            <button
+              onClick={() => handleShare('whatsapp')}
+              className="flex items-center justify-center gap-2 bg-[#25D366] text-white px-4 py-3 rounded-lg font-medium hover:bg-[#20bd5a] transition-colors"
+            >
+              <Share2 size={18} />
+              WhatsApp
+            </button>
+          </div>
+          
+          <button
+            onClick={handleCopyLink}
+            className="w-full flex items-center justify-center gap-2 bg-slate-200 text-slate-700 px-4 py-3 rounded-lg font-medium hover:bg-slate-300 transition-colors mb-3"
+          >
+            <Share2 size={18} />
+            Text & Link kopieren
+          </button>
+          
+          <button
+            onClick={onClose}
+            className="text-slate-500 hover:text-slate-700 text-sm font-medium"
+          >
+            Später teilen
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const PieChartComponent = ({ data, centerText, centerSubtext }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
@@ -258,6 +379,47 @@ const BarChartComponent = ({ correct, incorrect }) => {
       </div>
     </div>
   );
+};
+
+// --- MILESTONE TRACKING UTILITIES ---
+
+const useMilestones = () => {
+  const [milestones, setMilestones] = useState(() => {
+    try {
+      const saved = localStorage.getItem('zurich-quiz-milestones');
+      return saved ? JSON.parse(saved) : {
+        first_perfect_score: false,
+        full_coverage: false
+      };
+    } catch (e) {
+      console.error("Failed to load milestones from localStorage", e);
+      return {
+        first_perfect_score: false,
+        full_coverage: false
+      };
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('zurich-quiz-milestones', JSON.stringify(milestones));
+    } catch (e) {
+      console.error("Failed to save milestones to localStorage", e);
+    }
+  }, [milestones]);
+
+  const checkAndSetMilestone = (milestoneKey) => {
+    if (!milestones[milestoneKey]) {
+      setMilestones(prev => ({
+        ...prev,
+        [milestoneKey]: true
+      }));
+      return true; // Milestone just achieved
+    }
+    return false; // Already achieved
+  };
+
+  return { milestones, checkAndSetMilestone };
 };
 
 // --- LOGIC: SMART LEARNING SYSTEM (WITH LOCAL STORAGE) ---
@@ -930,8 +1092,11 @@ const FlashcardScreen = ({ questions, weakestQuestions, onExit }) => {
   );
 };
 
-const ResultScreen = ({ score, total, onRestart, onHome }) => {
+const ResultScreen = ({ score, total, onRestart, onHome, checkAndSetMilestone }) => {
   const percentage = Math.round((score / total) * 100);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [achievedMilestone, setAchievedMilestone] = useState(null);
+  
   let message = "";
   let subMessage = "";
   
@@ -946,7 +1111,7 @@ const ResultScreen = ({ score, total, onRestart, onHome }) => {
     subMessage = "Keine Sorge, das System merkt sich Ihre Fehler und hilft Ihnen beim Lernen.";
   }
 
-  // Track quiz completion
+  // Track quiz completion and check for perfect score milestone
   useEffect(() => {
     trackEvent('quiz_complete', {
       score: score,
@@ -954,10 +1119,34 @@ const ResultScreen = ({ score, total, onRestart, onHome }) => {
       percentage: percentage,
       performance_level: percentage >= 90 ? 'excellent' : percentage >= 70 ? 'good' : 'needs_practice'
     });
-  }, [score, total, percentage]);
+    
+    // Check for perfect score milestone (15/15)
+    if (score === total && total === 15 && checkAndSetMilestone) {
+      const isNew = checkAndSetMilestone('first_perfect_score');
+      if (isNew) {
+        trackEvent('milestone_achieved', { 
+          milestone: 'first_perfect_score',
+          score: score,
+          total: total 
+        });
+        // Schedule state updates to avoid cascading renders
+        setTimeout(() => {
+          setAchievedMilestone('perfect_score');
+          setShowShareModal(true);
+        }, 0);
+      }
+    }
+  }, [score, total, percentage, checkAndSetMilestone]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-fade-in">
+    <>
+      {showShareModal && achievedMilestone && (
+        <SocialShareModal 
+          onClose={() => setShowShareModal(false)}
+          milestone={achievedMilestone}
+        />
+      )}
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-fade-in">
       <div className="relative mb-8">
         <Trophy className={`w-32 h-32 ${percentage >= 70 ? 'text-yellow-400' : 'text-slate-300'}`} />
         {percentage >= 70 && (
@@ -998,7 +1187,8 @@ const ResultScreen = ({ score, total, onRestart, onHome }) => {
           <Home size={18} /> Hauptmenü
         </Button>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
@@ -1019,6 +1209,11 @@ const App = () => {
   
   // Initialize Smart Learning Hook (Persistence handled inside)
   const { progress, updateProgress, getWeightedQuestions, getWeakestQuestions, resetProgress } = useSmartLearning();
+  
+  // Initialize Milestones Hook
+  const { checkAndSetMilestone } = useMilestones();
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [achievedMilestone, setAchievedMilestone] = useState(null);
 
   // Listen for install events
   useEffect(() => {
@@ -1044,6 +1239,25 @@ const App = () => {
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
+  
+  // Check for 100% question coverage milestone
+  useEffect(() => {
+    const totalAnswered = Object.keys(progress).length;
+    if (totalAnswered === QUESTIONS_DATA.length && totalAnswered > 0) {
+      const isNew = checkAndSetMilestone('full_coverage');
+      if (isNew) {
+        trackEvent('milestone_achieved', { 
+          milestone: 'full_coverage',
+          total_questions: QUESTIONS_DATA.length 
+        });
+        // Schedule state updates to avoid cascading renders
+        setTimeout(() => {
+          setAchievedMilestone('full_coverage');
+          setShowShareModal(true);
+        }, 0);
+      }
+    }
+  }, [progress, checkAndSetMilestone]);
 
   const handleInstallClick = async () => {
     if (window.showInstallPrompt) {
@@ -1089,6 +1303,14 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-red-100 selection:text-red-900">
+      {/* Social Share Modal for 100% Coverage */}
+      {showShareModal && achievedMilestone && (
+        <SocialShareModal 
+          onClose={() => setShowShareModal(false)}
+          milestone={achievedMilestone}
+        />
+      )}
+      
       {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -1152,7 +1374,8 @@ const App = () => {
             score={score} 
             total={questionCount} 
             onRestart={startQuiz} 
-            onHome={() => setScreen('welcome')} 
+            onHome={() => setScreen('welcome')}
+            checkAndSetMilestone={checkAndSetMilestone}
           />
         )}
       </main>
