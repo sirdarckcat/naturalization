@@ -8,6 +8,9 @@ const trackEvent = (eventName, eventParams = {}) => {
   }
 };
 
+// Constants
+const QUESTION_TEXT_TRUNCATION_LENGTH = 100;
+
 const SwissFlag = ({ size = 24, className = "" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"  width={size} height={size} className={className}>
     <defs>
@@ -102,6 +105,8 @@ const Modal = ({ children, onClose, title }) => (
 
 // Social Share Modal Component
 const SocialShareModal = ({ onClose, milestone }) => {
+  const [copySuccess, setCopySuccess] = useState(false);
+  
   const shareText = milestone === 'perfect_score' 
     ? `🎉 Ich habe gerade 15/15 richtig beim Grundkenntnistest Zürich geschafft! Perfekte Punktzahl! 🇨🇭 #Einbürgerung #GKTZürich`
     : `🎓 Ich habe gerade 100% Abdeckung beim Grundkenntnistest Zürich erreicht! Alle Fragen beantwortet! 🇨🇭 #Einbürgerung #GKTZürich`;
@@ -142,7 +147,8 @@ const SocialShareModal = ({ onClose, milestone }) => {
     const textToCopy = `${shareText}\n${shareUrl}`;
     navigator.clipboard.writeText(textToCopy).then(() => {
       trackEvent('milestone_copy_link', { milestone: milestone });
-      alert('Text und Link kopiert!');
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
     });
   };
   
@@ -203,10 +209,23 @@ const SocialShareModal = ({ onClose, milestone }) => {
           
           <button
             onClick={handleCopyLink}
-            className="w-full flex items-center justify-center gap-2 bg-slate-200 text-slate-700 px-4 py-3 rounded-lg font-medium hover:bg-slate-300 transition-colors mb-3"
+            className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors mb-3 ${
+              copySuccess 
+                ? 'bg-green-100 text-green-700' 
+                : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+            }`}
           >
-            <Share2 size={18} />
-            Text & Link kopieren
+            {copySuccess ? (
+              <>
+                <CheckCircle size={18} />
+                Kopiert!
+              </>
+            ) : (
+              <>
+                <Share2 size={18} />
+                Text & Link kopieren
+              </>
+            )}
           </button>
           
           <button
@@ -797,7 +816,7 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
         question_id: currentQuestion.id,
         category: currentQuestion.category,
         level: currentQuestion.level,
-        question_text: currentQuestion.question.substring(0, 100), // First 100 chars for identification
+        question_text: currentQuestion.question.substring(0, QUESTION_TEXT_TRUNCATION_LENGTH),
         question_number: currentIndex + 1
       });
     }
