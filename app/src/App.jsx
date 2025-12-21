@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2, PlayCircle, X, PieChart, BarChart3, Download } from 'lucide-react';
 
+// Analytics tracking utility
+const trackEvent = (eventName, eventParams = {}) => {
+  if (window.gtag) {
+    window.gtag('event', eventName, eventParams);
+  }
+};
+
 const SwissFlag = ({ size = 24, className = "" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"  width={size} height={size} className={className}>
     <defs>
@@ -392,7 +399,13 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
           <div className="flex gap-6 justify-center w-full bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-4">
             <div 
               className="text-center cursor-pointer hover:bg-slate-50 rounded-lg p-2 transition-colors group"
-              onClick={() => setShowQuestionsModal(true)}
+              onClick={() => {
+                trackEvent('view_questions_modal', { 
+                  total_answered: totalAnswered,
+                  mastered_count: masteredCount 
+                });
+                setShowQuestionsModal(true);
+              }}
             >
               <div className="text-2xl font-bold text-slate-800 group-hover:text-red-600 transition-colors">{totalAnswered}</div>
               <div className="text-xs text-slate-500 uppercase font-bold tracking-wider flex items-center gap-1 justify-center">
@@ -402,7 +415,14 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
             <div className="w-px bg-slate-200"></div>
             <div 
               className="text-center cursor-pointer hover:bg-slate-50 rounded-lg p-2 transition-colors group"
-              onClick={() => setShowSuccessRateModal(true)}
+              onClick={() => {
+                trackEvent('view_success_rate_modal', { 
+                  mastery_rate: masteryRate,
+                  correct_answers: correctAnswers,
+                  total_attempts: totalAttempts 
+                });
+                setShowSuccessRateModal(true);
+              }}
             >
               <div className={`text-2xl font-bold ${masteryRate >= 80 ? 'text-green-600' : 'text-slate-800'} group-hover:text-red-600 transition-colors`}>{masteryRate}%</div>
               <div className="text-xs text-slate-500 uppercase font-bold tracking-wider flex items-center gap-1 justify-center">
@@ -411,7 +431,13 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
             </div>
           </div>
           <button 
-            onClick={onReset}
+            onClick={() => {
+              trackEvent('progress_reset', { 
+                questions_seen: totalAnswered,
+                mastery_rate: masteryRate 
+              });
+              onReset();
+            }}
             className="text-xs text-red-400 hover:text-red-600 flex items-center justify-center gap-1 mx-auto transition-colors"
           >
             <Trash2 size={12} /> Fortschritt zurücksetzen
@@ -469,7 +495,10 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl">
-        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={onStart}>
+        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => {
+          trackEvent('start_quiz', { source: 'card_click' });
+          onStart();
+        }}>
           <div className="flex flex-col items-center space-y-4">
             <div className="p-4 bg-red-50 rounded-full group-hover:bg-red-100 transition-colors">
               <BookOpen className="w-8 h-8 text-red-600" />
@@ -482,6 +511,7 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
               className="w-full"
               onClick={(e) => {
                 e.stopPropagation();
+                trackEvent('start_quiz', { source: 'button_click' });
                 onStart();
               }}
             >
@@ -490,7 +520,10 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
           </div>
         </Card>
 
-        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={onStartFlashcards}>
+        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => {
+          trackEvent('start_flashcards', { source: 'card_click' });
+          onStartFlashcards();
+        }}>
           <div className="flex flex-col items-center space-y-4">
             <div className="p-4 bg-slate-100 rounded-full group-hover:bg-slate-200 transition-colors">
               <Layers className="w-8 h-8 text-slate-600" />
@@ -504,6 +537,7 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
               className="w-full"
               onClick={(e) => {
                 e.stopPropagation();
+                trackEvent('start_flashcards', { source: 'button_click' });
                 onStartFlashcards();
               }}
             >
@@ -512,7 +546,10 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
           </div>
         </Card>
 
-        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => window.open('https://www.youtube.com/playlist?list=PLg1iF-QfOu4_3pMJTx1noY9Hj939cBamq', '_blank', 'noopener') }>
+        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => {
+          trackEvent('open_video_playlist', { source: 'card_click' });
+          window.open('https://www.youtube.com/playlist?list=PLg1iF-QfOu4_3pMJTx1noY9Hj939cBamq', '_blank', 'noopener');
+        }}>
           <div className="flex flex-col items-center space-y-4">
             <div className="p-4 bg-amber-50 rounded-full group-hover:bg-amber-100 transition-colors">
               <PlayCircle className="w-8 h-8 text-amber-600" />
@@ -526,6 +563,7 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
               className="w-full"
               onClick={(e) => {
                 e.stopPropagation();
+                trackEvent('open_video_playlist', { source: 'button_click' });
                 window.open('https://www.youtube.com/playlist?list=PLg1iF-QfOu4_3pMJTx1noY9Hj939cBamq', '_blank', 'noopener');
               }}
             >
@@ -580,6 +618,28 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
     if (isCorrect) {
       setScore(score + 1);
     }
+    
+    // Track answer
+    trackEvent('quiz_answer', {
+      question_id: currentQuestion.id,
+      category: currentQuestion.category,
+      level: currentQuestion.level,
+      is_correct: isCorrect,
+      question_number: currentIndex + 1,
+      total_questions: questions.length
+    });
+    
+    // Track incorrect answers separately for easier analysis
+    if (!isCorrect) {
+      trackEvent('question_incorrect', {
+        question_id: currentQuestion.id,
+        category: currentQuestion.category,
+        level: currentQuestion.level,
+        question_text: currentQuestion.question.substring(0, 100), // First 100 chars for identification
+        question_number: currentIndex + 1
+      });
+    }
+    
     // Update Smart Learning System
     onAnswer(currentQuestion.id, isCorrect);
   };
@@ -607,12 +667,25 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
   return (
     <div className="max-w-3xl mx-auto w-full px-4 py-6 space-y-6">
       <div className="flex items-center justify-between mb-4">
-        <button onClick={onExit} className="text-slate-500 hover:text-slate-700 flex items-center gap-1 text-sm font-medium">
+        <button onClick={() => {
+          trackEvent('quiz_exit', { 
+            questions_completed: currentIndex,
+            total_questions: questions.length 
+          });
+          onExit();
+        }} className="text-slate-500 hover:text-slate-700 flex items-center gap-1 text-sm font-medium">
           <Home size={16} /> Beenden
         </button>
         <div className="flex items-center gap-4">
            <button 
-             onClick={() => setShowTranslate(!showTranslate)} 
+             onClick={() => {
+               const newValue = !showTranslate;
+               trackEvent('toggle_translation', { 
+                 language: newValue ? 'en' : 'de',
+                 screen: 'quiz' 
+               });
+               setShowTranslate(newValue);
+             }}
              className={`flex items-center gap-1 text-sm font-medium px-3 py-1 rounded-full transition-colors ${showTranslate ? 'bg-red-100 text-red-700' : 'text-slate-500 hover:bg-slate-100'}`}
            >
              <Globe size={16} />
@@ -707,6 +780,10 @@ const FlashcardScreen = ({ questions, weakestQuestions, onExit }) => {
 
   // Reset index when mode changes by handling it in the mode setter
   const handleModeChange = (newMode) => {
+    trackEvent('flashcard_mode_change', { 
+      new_mode: newMode,
+      previous_mode: mode 
+    });
     setMode(newMode);
     setCurrentIndex(0);
     setIsFlipped(false);
@@ -774,7 +851,14 @@ const FlashcardScreen = ({ questions, weakestQuestions, onExit }) => {
 
       <div className="w-full flex justify-end mb-4">
          <button 
-             onClick={() => setShowTranslate(!showTranslate)} 
+             onClick={() => {
+               const newValue = !showTranslate;
+               trackEvent('toggle_translation', { 
+                 language: newValue ? 'en' : 'de',
+                 screen: 'flashcards' 
+               });
+               setShowTranslate(newValue);
+             }}
              className={`flex items-center gap-1 text-sm font-medium px-3 py-1 rounded-full transition-colors ${showTranslate ? 'bg-red-100 text-red-700' : 'text-slate-500 hover:bg-slate-100'}`}
            >
              <Globe size={16} />
@@ -782,7 +866,16 @@ const FlashcardScreen = ({ questions, weakestQuestions, onExit }) => {
            </button>
       </div>
 
-      <div className="flex-1 w-full perspective-1000 relative group cursor-pointer" onClick={() => setIsFlipped(!isFlipped)}>
+      <div className="flex-1 w-full perspective-1000 relative group cursor-pointer" onClick={() => {
+        const newFlipped = !isFlipped;
+        if (newFlipped) {
+          trackEvent('flashcard_flip', { 
+            mode: mode,
+            question_id: currentQuestion.id 
+          });
+        }
+        setIsFlipped(newFlipped);
+      }}>
         <div className={`relative w-full h-full transition-all duration-500 preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
           
           {/* Front */}
@@ -853,6 +946,16 @@ const ResultScreen = ({ score, total, onRestart, onHome }) => {
     subMessage = "Keine Sorge, das System merkt sich Ihre Fehler und hilft Ihnen beim Lernen.";
   }
 
+  // Track quiz completion
+  useEffect(() => {
+    trackEvent('quiz_complete', {
+      score: score,
+      total: total,
+      percentage: percentage,
+      performance_level: percentage >= 90 ? 'excellent' : percentage >= 70 ? 'good' : 'needs_practice'
+    });
+  }, [score, total, percentage]);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-fade-in">
       <div className="relative mb-8">
@@ -879,10 +982,19 @@ const ResultScreen = ({ score, total, onRestart, onHome }) => {
       </Card>
 
       <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
-        <Button onClick={onRestart} className="flex-1">
+        <Button onClick={() => {
+          trackEvent('quiz_restart', { 
+            previous_score: score,
+            previous_percentage: percentage 
+          });
+          onRestart();
+        }} className="flex-1">
           <RefreshCw size={18} /> Nochmals versuchen
         </Button>
-        <Button variant="secondary" onClick={onHome} className="flex-1">
+        <Button variant="secondary" onClick={() => {
+          trackEvent('return_home', { source: 'result_screen' });
+          onHome();
+        }} className="flex-1">
           <Home size={18} /> Hauptmenü
         </Button>
       </div>
@@ -945,6 +1057,22 @@ const App = () => {
     setActiveQuestions(selection);
     setScore(0);
     setScreen('quiz');
+    
+    // Track quiz start with question metadata
+    const categories = selection.reduce((acc, q) => {
+      acc[q.category] = (acc[q.category] || 0) + 1;
+      return acc;
+    }, {});
+    const levels = selection.reduce((acc, q) => {
+      acc[q.level] = (acc[q.level] || 0) + 1;
+      return acc;
+    }, {});
+    
+    trackEvent('quiz_start', {
+      question_count: selection.length,
+      categories: JSON.stringify(categories),
+      levels: JSON.stringify(levels)
+    });
   };
 
   const startFlashcards = () => {

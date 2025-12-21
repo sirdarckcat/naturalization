@@ -1,26 +1,98 @@
 <!doctype html>
-<html lang="en">
+<html lang="de-CH">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/gktzh.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#DC2626" />
-    <meta name="description" content="Vorbereitung auf den Grundkenntnistest Zürich für die Einbürgerung" />
+    
+    <!-- Primary Meta Tags -->
+    <title>Grundkenntnistest Zürich - Einbürgerung Vorbereitung | Smart Quiz & Lernkarten</title>
+    <meta name="title" content="Grundkenntnistest Zürich - Einbürgerung Vorbereitung | Smart Quiz & Lernkarten" />
+    <meta name="description" content="Bereiten Sie sich optimal auf den Grundkenntnistest Zürich vor. Intelligentes Quiz-System mit adaptivem Lernen, Lernkarten und Offline-Unterstützung. Kostenlos und ohne Anmeldung." />
+    <meta name="keywords" content="Grundkenntnistest Zürich, Einbürgerung, Naturalisierung, Schweiz, Zürich, Quiz, Lernkarten, Flashcards, Test Vorbereitung, GKT, Staatskunde" />
+    <meta name="author" content="Grundkenntnistest Zürich" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="German" />
+    <meta name="revisit-after" content="7 days" />
+    <link rel="canonical" href="https://gktzh.app/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://gktzh.app/" />
+    <meta property="og:title" content="Grundkenntnistest Zürich - Einbürgerung Vorbereitung" />
+    <meta property="og:description" content="Bereiten Sie sich optimal auf den Grundkenntnistest Zürich vor. Intelligentes Quiz-System mit adaptivem Lernen, Lernkarten und Offline-Unterstützung." />
+    <meta property="og:image" content="https://gktzh.app/screenshot-home-wide.png" />
+    <meta property="og:image:alt" content="Grundkenntnistest Zürich Quiz Interface" />
+    <meta property="og:locale" content="de_CH" />
+    <meta property="og:site_name" content="Grundkenntnistest Zürich" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://gktzh.app/" />
+    <meta property="twitter:title" content="Grundkenntnistest Zürich - Einbürgerung Vorbereitung" />
+    <meta property="twitter:description" content="Bereiten Sie sich optimal auf den Grundkenntnistest Zürich vor. Intelligentes Quiz-System mit adaptivem Lernen und Offline-Unterstützung." />
+    <meta property="twitter:image" content="https://gktzh.app/screenshot-home-wide.png" />
+    
+    <!-- PWA Meta Tags -->
     <link rel="manifest" href="/manifest.json" />
-    <link rel="apple-touch-icon" href="/gktzh.svg" />
-    <title>Grundkenntnistest Zürich</title>
+    <link rel="apple-touch-icon" href="/icon-192x192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="GK Zürich" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalApplication",
+      "name": "Grundkenntnistest Zürich",
+      "description": "Intelligentes Quiz-System zur Vorbereitung auf den Grundkenntnistest Zürich für die Einbürgerung in der Schweiz",
+      "url": "https://gktzh.app/",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web Browser, iOS, Android",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "CHF"
+      },
+      "educationalLevel": "Adult Education",
+      "learningResourceType": "Quiz",
+      "inLanguage": ["de-CH", "en"],
+      "about": {
+        "@type": "Thing",
+        "name": "Swiss Naturalization",
+        "description": "Preparation for the Zurich basic knowledge test required for naturalization"
+      },
+      "featureList": [
+        "Adaptive learning system",
+        "Flashcards mode",
+        "Offline support",
+        "Progress tracking",
+        "Multilingual support (German/English)"
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-FMD5GKG2N2"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FMD5GKG2N2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  gtag('config', 'G-FMD5GKG2N2');
-</script>
+      gtag('config', 'G-FMD5GKG2N2', {
+        'send_page_view': true,
+        'anonymize_ip': true
+      });
+      
+      // Make gtag available globally for event tracking
+      window.gtag = gtag;
+    </script>
   </body>
 </html>
