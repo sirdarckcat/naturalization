@@ -1,0 +1,9 @@
+# robots.txt for Grundkenntnistest Zürich
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://gktzh.app/sitemap.xml
+
+# Crawl-delay (optional, in seconds)
+Crawl-delay: 1

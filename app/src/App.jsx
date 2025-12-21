@@ -1,5 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2, PlayCircle, X, PieChart, BarChart3, Download } from 'lucide-react';
+import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2, PlayCircle, X, PieChart, BarChart3, Download, Share2, Sparkles } from 'lucide-react';
+
+// Analytics tracking utility
+const trackEvent = (eventName, eventParams = {}) => {
+  if (window.gtag) {
+    window.gtag('event', eventName, eventParams);
+  }
+};
+
+// Constants
+const QUESTION_TEXT_TRUNCATION_LENGTH = 100;
 
 const SwissFlag = ({ size = 24, className = "" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"  width={size} height={size} className={className}>
@@ -92,6 +102,143 @@ const Modal = ({ children, onClose, title }) => (
     </div>
   </div>
 );
+
+// Social Share Modal Component
+const SocialShareModal = ({ onClose, milestone }) => {
+  const [copySuccess, setCopySuccess] = useState(false);
+  
+  const shareText = milestone === 'perfect_score' 
+    ? `🎉 Ich habe gerade 15/15 richtig beim Grundkenntnistest Zürich geschafft! Perfekte Punktzahl! 🇨🇭 #Einbürgerung #GKTZürich`
+    : `🎓 Ich habe gerade 100% Abdeckung beim Grundkenntnistest Zürich erreicht! Alle Fragen beantwortet! 🇨🇭 #Einbürgerung #GKTZürich`;
+  
+  const shareUrl = 'https://gktzh.app/';
+  
+  const handleShare = (platform) => {
+    let url = '';
+    const encodedText = encodeURIComponent(shareText);
+    const encodedUrl = encodeURIComponent(shareUrl);
+    
+    switch(platform) {
+      case 'twitter':
+        url = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+        break;
+      case 'facebook':
+        url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+        break;
+      case 'linkedin':
+        url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+        break;
+      case 'whatsapp':
+        url = `https://wa.me/?text=${encodedText}%20${encodedUrl}`;
+        break;
+      default:
+        return;
+    }
+    
+    trackEvent('milestone_share', { 
+      milestone: milestone,
+      platform: platform 
+    });
+    
+    window.open(url, '_blank', 'width=600,height=400');
+  };
+  
+  const handleCopyLink = () => {
+    const textToCopy = `${shareText}\n${shareUrl}`;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      trackEvent('milestone_copy_link', { milestone: milestone });
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    });
+  };
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in" onClick={onClose}>
+      <div className="bg-gradient-to-br from-red-50 to-white rounded-xl shadow-2xl max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+        <div className="p-8 text-center">
+          <div className="mb-6 flex justify-center">
+            <div className="bg-red-100 rounded-full p-4 animate-bounce">
+              <Sparkles className="w-12 h-12 text-red-600" />
+            </div>
+          </div>
+          
+          <h2 className="text-3xl font-bold text-slate-800 mb-3">
+            {milestone === 'perfect_score' ? '🎉 Perfekt!' : '🎓 Meilenstein erreicht!'}
+          </h2>
+          
+          <p className="text-lg text-slate-600 mb-6">
+            {milestone === 'perfect_score' 
+              ? 'Sie haben zum ersten Mal 15/15 richtig! Teilen Sie diesen Erfolg!'
+              : 'Sie haben alle Fragen gesehen! 100% Abdeckung erreicht!'}
+          </p>
+          
+          <div className="bg-slate-50 rounded-lg p-4 mb-6 text-sm text-slate-700">
+            {shareText}
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <button
+              onClick={() => handleShare('twitter')}
+              className="flex items-center justify-center gap-2 bg-[#1DA1F2] text-white px-4 py-3 rounded-lg font-medium hover:bg-[#1a8cd8] transition-colors"
+            >
+              <Share2 size={18} />
+              Twitter
+            </button>
+            <button
+              onClick={() => handleShare('facebook')}
+              className="flex items-center justify-center gap-2 bg-[#1877F2] text-white px-4 py-3 rounded-lg font-medium hover:bg-[#1664d8] transition-colors"
+            >
+              <Share2 size={18} />
+              Facebook
+            </button>
+            <button
+              onClick={() => handleShare('linkedin')}
+              className="flex items-center justify-center gap-2 bg-[#0A66C2] text-white px-4 py-3 rounded-lg font-medium hover:bg-[#094d92] transition-colors"
+            >
+              <Share2 size={18} />
+              LinkedIn
+            </button>
+            <button
+              onClick={() => handleShare('whatsapp')}
+              className="flex items-center justify-center gap-2 bg-[#25D366] text-white px-4 py-3 rounded-lg font-medium hover:bg-[#20bd5a] transition-colors"
+            >
+              <Share2 size={18} />
+              WhatsApp
+            </button>
+          </div>
+          
+          <button
+            onClick={handleCopyLink}
+            className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors mb-3 ${
+              copySuccess 
+                ? 'bg-green-100 text-green-700' 
+                : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+            }`}
+          >
+            {copySuccess ? (
+              <>
+                <CheckCircle size={18} />
+                Kopiert!
+              </>
+            ) : (
+              <>
+                <Share2 size={18} />
+                Text & Link kopieren
+              </>
+            )}
+          </button>
+          
+          <button
+            onClick={onClose}
+            className="text-slate-500 hover:text-slate-700 text-sm font-medium"
+          >
+            Später teilen
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const PieChartComponent = ({ data, centerText, centerSubtext }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
@@ -253,6 +400,47 @@ const BarChartComponent = ({ correct, incorrect }) => {
   );
 };
 
+// --- MILESTONE TRACKING UTILITIES ---
+
+const useMilestones = () => {
+  const [milestones, setMilestones] = useState(() => {
+    try {
+      const saved = localStorage.getItem('zurich-quiz-milestones');
+      return saved ? JSON.parse(saved) : {
+        first_perfect_score: false,
+        full_coverage: false
+      };
+    } catch (e) {
+      console.error("Failed to load milestones from localStorage", e);
+      return {
+        first_perfect_score: false,
+        full_coverage: false
+      };
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('zurich-quiz-milestones', JSON.stringify(milestones));
+    } catch (e) {
+      console.error("Failed to save milestones to localStorage", e);
+    }
+  }, [milestones]);
+
+  const checkAndSetMilestone = (milestoneKey) => {
+    if (!milestones[milestoneKey]) {
+      setMilestones(prev => ({
+        ...prev,
+        [milestoneKey]: true
+      }));
+      return true; // Milestone just achieved
+    }
+    return false; // Already achieved
+  };
+
+  return { milestones, checkAndSetMilestone };
+};
+
 // --- LOGIC: SMART LEARNING SYSTEM (WITH LOCAL STORAGE) ---
 
 const useSmartLearning = () => {
@@ -392,7 +580,13 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
           <div className="flex gap-6 justify-center w-full bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-4">
             <div 
               className="text-center cursor-pointer hover:bg-slate-50 rounded-lg p-2 transition-colors group"
-              onClick={() => setShowQuestionsModal(true)}
+              onClick={() => {
+                trackEvent('view_questions_modal', { 
+                  total_answered: totalAnswered,
+                  mastered_count: masteredCount 
+                });
+                setShowQuestionsModal(true);
+              }}
             >
               <div className="text-2xl font-bold text-slate-800 group-hover:text-red-600 transition-colors">{totalAnswered}</div>
               <div className="text-xs text-slate-500 uppercase font-bold tracking-wider flex items-center gap-1 justify-center">
@@ -402,7 +596,14 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
             <div className="w-px bg-slate-200"></div>
             <div 
               className="text-center cursor-pointer hover:bg-slate-50 rounded-lg p-2 transition-colors group"
-              onClick={() => setShowSuccessRateModal(true)}
+              onClick={() => {
+                trackEvent('view_success_rate_modal', { 
+                  mastery_rate: masteryRate,
+                  correct_answers: correctAnswers,
+                  total_attempts: totalAttempts 
+                });
+                setShowSuccessRateModal(true);
+              }}
             >
               <div className={`text-2xl font-bold ${masteryRate >= 80 ? 'text-green-600' : 'text-slate-800'} group-hover:text-red-600 transition-colors`}>{masteryRate}%</div>
               <div className="text-xs text-slate-500 uppercase font-bold tracking-wider flex items-center gap-1 justify-center">
@@ -411,7 +612,13 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
             </div>
           </div>
           <button 
-            onClick={onReset}
+            onClick={() => {
+              trackEvent('progress_reset', { 
+                questions_seen: totalAnswered,
+                mastery_rate: masteryRate 
+              });
+              onReset();
+            }}
             className="text-xs text-red-400 hover:text-red-600 flex items-center justify-center gap-1 mx-auto transition-colors"
           >
             <Trash2 size={12} /> Fortschritt zurücksetzen
@@ -469,7 +676,10 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl">
-        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={onStart}>
+        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => {
+          trackEvent('start_quiz', { source: 'card_click' });
+          onStart();
+        }}>
           <div className="flex flex-col items-center space-y-4">
             <div className="p-4 bg-red-50 rounded-full group-hover:bg-red-100 transition-colors">
               <BookOpen className="w-8 h-8 text-red-600" />
@@ -482,6 +692,7 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
               className="w-full"
               onClick={(e) => {
                 e.stopPropagation();
+                trackEvent('start_quiz', { source: 'button_click' });
                 onStart();
               }}
             >
@@ -490,7 +701,10 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
           </div>
         </Card>
 
-        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={onStartFlashcards}>
+        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => {
+          trackEvent('start_flashcards', { source: 'card_click' });
+          onStartFlashcards();
+        }}>
           <div className="flex flex-col items-center space-y-4">
             <div className="p-4 bg-slate-100 rounded-full group-hover:bg-slate-200 transition-colors">
               <Layers className="w-8 h-8 text-slate-600" />
@@ -504,6 +718,7 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
               className="w-full"
               onClick={(e) => {
                 e.stopPropagation();
+                trackEvent('start_flashcards', { source: 'button_click' });
                 onStartFlashcards();
               }}
             >
@@ -512,7 +727,10 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
           </div>
         </Card>
 
-        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => window.open('https://www.youtube.com/playlist?list=PLg1iF-QfOu4_3pMJTx1noY9Hj939cBamq', '_blank', 'noopener') }>
+        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => {
+          trackEvent('open_video_playlist', { source: 'card_click' });
+          window.open('https://www.youtube.com/playlist?list=PLg1iF-QfOu4_3pMJTx1noY9Hj939cBamq', '_blank', 'noopener');
+        }}>
           <div className="flex flex-col items-center space-y-4">
             <div className="p-4 bg-amber-50 rounded-full group-hover:bg-amber-100 transition-colors">
               <PlayCircle className="w-8 h-8 text-amber-600" />
@@ -526,6 +744,7 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
               className="w-full"
               onClick={(e) => {
                 e.stopPropagation();
+                trackEvent('open_video_playlist', { source: 'button_click' });
                 window.open('https://www.youtube.com/playlist?list=PLg1iF-QfOu4_3pMJTx1noY9Hj939cBamq', '_blank', 'noopener');
               }}
             >
@@ -580,6 +799,28 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
     if (isCorrect) {
       setScore(score + 1);
     }
+    
+    // Track answer
+    trackEvent('quiz_answer', {
+      question_id: currentQuestion.id,
+      category: currentQuestion.category,
+      level: currentQuestion.level,
+      is_correct: isCorrect,
+      question_number: currentIndex + 1,
+      total_questions: questions.length
+    });
+    
+    // Track incorrect answers separately for easier analysis
+    if (!isCorrect) {
+      trackEvent('question_incorrect', {
+        question_id: currentQuestion.id,
+        category: currentQuestion.category,
+        level: currentQuestion.level,
+        question_text: currentQuestion.question.substring(0, QUESTION_TEXT_TRUNCATION_LENGTH),
+        question_number: currentIndex + 1
+      });
+    }
+    
     // Update Smart Learning System
     onAnswer(currentQuestion.id, isCorrect);
   };
@@ -607,12 +848,25 @@ const QuizScreen = ({ questions, onFinish, onExit, onAnswer }) => {
   return (
     <div className="max-w-3xl mx-auto w-full px-4 py-6 space-y-6">
       <div className="flex items-center justify-between mb-4">
-        <button onClick={onExit} className="text-slate-500 hover:text-slate-700 flex items-center gap-1 text-sm font-medium">
+        <button onClick={() => {
+          trackEvent('quiz_exit', { 
+            questions_completed: currentIndex,
+            total_questions: questions.length 
+          });
+          onExit();
+        }} className="text-slate-500 hover:text-slate-700 flex items-center gap-1 text-sm font-medium">
           <Home size={16} /> Beenden
         </button>
         <div className="flex items-center gap-4">
            <button 
-             onClick={() => setShowTranslate(!showTranslate)} 
+             onClick={() => {
+               const newValue = !showTranslate;
+               trackEvent('toggle_translation', { 
+                 language: newValue ? 'en' : 'de',
+                 screen: 'quiz' 
+               });
+               setShowTranslate(newValue);
+             }}
              className={`flex items-center gap-1 text-sm font-medium px-3 py-1 rounded-full transition-colors ${showTranslate ? 'bg-red-100 text-red-700' : 'text-slate-500 hover:bg-slate-100'}`}
            >
              <Globe size={16} />
@@ -707,6 +961,10 @@ const FlashcardScreen = ({ questions, weakestQuestions, onExit }) => {
 
   // Reset index when mode changes by handling it in the mode setter
   const handleModeChange = (newMode) => {
+    trackEvent('flashcard_mode_change', { 
+      new_mode: newMode,
+      previous_mode: mode 
+    });
     setMode(newMode);
     setCurrentIndex(0);
     setIsFlipped(false);
@@ -774,7 +1032,14 @@ const FlashcardScreen = ({ questions, weakestQuestions, onExit }) => {
 
       <div className="w-full flex justify-end mb-4">
          <button 
-             onClick={() => setShowTranslate(!showTranslate)} 
+             onClick={() => {
+               const newValue = !showTranslate;
+               trackEvent('toggle_translation', { 
+                 language: newValue ? 'en' : 'de',
+                 screen: 'flashcards' 
+               });
+               setShowTranslate(newValue);
+             }}
              className={`flex items-center gap-1 text-sm font-medium px-3 py-1 rounded-full transition-colors ${showTranslate ? 'bg-red-100 text-red-700' : 'text-slate-500 hover:bg-slate-100'}`}
            >
              <Globe size={16} />
@@ -782,7 +1047,16 @@ const FlashcardScreen = ({ questions, weakestQuestions, onExit }) => {
            </button>
       </div>
 
-      <div className="flex-1 w-full perspective-1000 relative group cursor-pointer" onClick={() => setIsFlipped(!isFlipped)}>
+      <div className="flex-1 w-full perspective-1000 relative group cursor-pointer" onClick={() => {
+        const newFlipped = !isFlipped;
+        if (newFlipped) {
+          trackEvent('flashcard_flip', { 
+            mode: mode,
+            question_id: currentQuestion.id 
+          });
+        }
+        setIsFlipped(newFlipped);
+      }}>
         <div className={`relative w-full h-full transition-all duration-500 preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
           
           {/* Front */}
@@ -837,8 +1111,11 @@ const FlashcardScreen = ({ questions, weakestQuestions, onExit }) => {
   );
 };
 
-const ResultScreen = ({ score, total, onRestart, onHome }) => {
+const ResultScreen = ({ score, total, onRestart, onHome, checkAndSetMilestone }) => {
   const percentage = Math.round((score / total) * 100);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [achievedMilestone, setAchievedMilestone] = useState(null);
+  
   let message = "";
   let subMessage = "";
   
@@ -853,8 +1130,42 @@ const ResultScreen = ({ score, total, onRestart, onHome }) => {
     subMessage = "Keine Sorge, das System merkt sich Ihre Fehler und hilft Ihnen beim Lernen.";
   }
 
+  // Track quiz completion and check for perfect score milestone
+  useEffect(() => {
+    trackEvent('quiz_complete', {
+      score: score,
+      total: total,
+      percentage: percentage,
+      performance_level: percentage >= 90 ? 'excellent' : percentage >= 70 ? 'good' : 'needs_practice'
+    });
+    
+    // Check for perfect score milestone (15/15)
+    if (score === total && total === 15 && checkAndSetMilestone) {
+      const isNew = checkAndSetMilestone('first_perfect_score');
+      if (isNew) {
+        trackEvent('milestone_achieved', { 
+          milestone: 'first_perfect_score',
+          score: score,
+          total: total 
+        });
+        // Schedule state updates to avoid cascading renders
+        setTimeout(() => {
+          setAchievedMilestone('perfect_score');
+          setShowShareModal(true);
+        }, 0);
+      }
+    }
+  }, [score, total, percentage, checkAndSetMilestone]);
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-fade-in">
+    <>
+      {showShareModal && achievedMilestone && (
+        <SocialShareModal 
+          onClose={() => setShowShareModal(false)}
+          milestone={achievedMilestone}
+        />
+      )}
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-fade-in">
       <div className="relative mb-8">
         <Trophy className={`w-32 h-32 ${percentage >= 70 ? 'text-yellow-400' : 'text-slate-300'}`} />
         {percentage >= 70 && (
@@ -879,14 +1190,24 @@ const ResultScreen = ({ score, total, onRestart, onHome }) => {
       </Card>
 
       <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
-        <Button onClick={onRestart} className="flex-1">
+        <Button onClick={() => {
+          trackEvent('quiz_restart', { 
+            previous_score: score,
+            previous_percentage: percentage 
+          });
+          onRestart();
+        }} className="flex-1">
           <RefreshCw size={18} /> Nochmals versuchen
         </Button>
-        <Button variant="secondary" onClick={onHome} className="flex-1">
+        <Button variant="secondary" onClick={() => {
+          trackEvent('return_home', { source: 'result_screen' });
+          onHome();
+        }} className="flex-1">
           <Home size={18} /> Hauptmenü
         </Button>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
@@ -907,6 +1228,11 @@ const App = () => {
   
   // Initialize Smart Learning Hook (Persistence handled inside)
   const { progress, updateProgress, getWeightedQuestions, getWeakestQuestions, resetProgress } = useSmartLearning();
+  
+  // Initialize Milestones Hook
+  const { checkAndSetMilestone } = useMilestones();
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [achievedMilestone, setAchievedMilestone] = useState(null);
 
   // Listen for install events
   useEffect(() => {
@@ -932,6 +1258,25 @@ const App = () => {
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
+  
+  // Check for 100% question coverage milestone
+  useEffect(() => {
+    const totalAnswered = Object.keys(progress).length;
+    if (totalAnswered === QUESTIONS_DATA.length && totalAnswered > 0) {
+      const isNew = checkAndSetMilestone('full_coverage');
+      if (isNew) {
+        trackEvent('milestone_achieved', { 
+          milestone: 'full_coverage',
+          total_questions: QUESTIONS_DATA.length 
+        });
+        // Schedule state updates to avoid cascading renders
+        setTimeout(() => {
+          setAchievedMilestone('full_coverage');
+          setShowShareModal(true);
+        }, 0);
+      }
+    }
+  }, [progress, checkAndSetMilestone]);
 
   const handleInstallClick = async () => {
     if (window.showInstallPrompt) {
@@ -945,6 +1290,22 @@ const App = () => {
     setActiveQuestions(selection);
     setScore(0);
     setScreen('quiz');
+    
+    // Track quiz start with question metadata
+    const categories = selection.reduce((acc, q) => {
+      acc[q.category] = (acc[q.category] || 0) + 1;
+      return acc;
+    }, {});
+    const levels = selection.reduce((acc, q) => {
+      acc[q.level] = (acc[q.level] || 0) + 1;
+      return acc;
+    }, {});
+    
+    trackEvent('quiz_start', {
+      question_count: selection.length,
+      categories: JSON.stringify(categories),
+      levels: JSON.stringify(levels)
+    });
   };
 
   const startFlashcards = () => {
@@ -961,6 +1322,14 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-red-100 selection:text-red-900">
+      {/* Social Share Modal for 100% Coverage */}
+      {showShareModal && achievedMilestone && (
+        <SocialShareModal 
+          onClose={() => setShowShareModal(false)}
+          milestone={achievedMilestone}
+        />
+      )}
+      
       {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -1024,7 +1393,8 @@ const App = () => {
             score={score} 
             total={questionCount} 
             onRestart={startQuiz} 
-            onHome={() => setScreen('welcome')} 
+            onHome={() => setScreen('welcome')}
+            checkAndSetMilestone={checkAndSetMilestone}
           />
         )}
       </main>
