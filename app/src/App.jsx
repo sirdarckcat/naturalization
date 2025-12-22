@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2, PlayCircle, X, PieChart, BarChart3, Download, Share2, Sparkles } from 'lucide-react';
 import ConsentBanner from './ConsentBanner';
 
@@ -11,6 +11,7 @@ const trackEvent = (eventName, eventParams = {}) => {
 
 // Constants
 const QUESTION_TEXT_TRUNCATION_LENGTH = 100;
+const GOOGLE_ADS_CONVERSION_ID = 'AW-17818336608/33GJCP77jtUbEOD6uLBC';
 
 const SwissFlag = ({ size = 24, className = "" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"  width={size} height={size} className={className}>
@@ -1116,6 +1117,7 @@ const ResultScreen = ({ score, total, onRestart, onHome, checkAndSetMilestone })
   const percentage = Math.round((score / total) * 100);
   const [showShareModal, setShowShareModal] = useState(false);
   const [achievedMilestone, setAchievedMilestone] = useState(null);
+  const conversionTracked = useRef(false);
   
   let message = "";
   let subMessage = "";
@@ -1140,13 +1142,14 @@ const ResultScreen = ({ score, total, onRestart, onHome, checkAndSetMilestone })
       performance_level: percentage >= 90 ? 'excellent' : percentage >= 70 ? 'good' : 'needs_practice'
     });
     
-    // Track Google Ads conversion
-    if (window.gtag) {
+    // Track Google Ads conversion (only once per quiz completion)
+    if (window.gtag && !conversionTracked.current) {
       window.gtag('event', 'conversion', {
-        'send_to': 'AW-17818336608/33GJCP77jtUbEOD6uLBC',
+        'send_to': GOOGLE_ADS_CONVERSION_ID,
         'value': 1.0,
         'currency': 'CHF'
       });
+      conversionTracked.current = true;
     }
     
     // Check for perfect score milestone (15/15)
