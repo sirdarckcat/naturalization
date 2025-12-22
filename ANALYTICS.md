@@ -193,6 +193,61 @@ Metric: Average(is_correct)
 
 ## Privacy & Compliance
 
+### Switzerland & GDPR Compliance
+
+This application is compliant with Swiss Data Protection Act (FADP/DSG) and GDPR requirements:
+
+- **Google Consent Mode V2**: Implemented with default consent set to 'denied'
+- **Cookie Consent Banner**: Users must explicitly consent before analytics tracking begins
+- **IP Anonymization**: All IP addresses are anonymized (`anonymize_ip: true`)
+- **Cookie Consent Storage**: User preferences are stored in localStorage
+- **No PII Tracking**: No personally identifiable information is tracked
+- **Question text truncation**: Limited to 100 characters for privacy
+- **Client-side only**: All tracking is done client-side with user's browser
+
+### Consent Mode Implementation
+
+The app implements Google Consent Mode V2 with the following default settings:
+
+```javascript
+gtag('consent', 'default', {
+  'analytics_storage': 'denied',       // Analytics cookies denied by default
+  'ad_storage': 'denied',             // Ad cookies denied (not used)
+  'ad_user_data': 'denied',           // Ad user data denied (not used)
+  'ad_personalization': 'denied',     // Ad personalization denied (not used)
+  'functionality_storage': 'granted', // Required for app functionality
+  'personalization_storage': 'denied',// Personalization denied by default
+  'security_storage': 'granted',      // Required for security
+  'wait_for_update': 500             // Wait 500ms for consent update
+});
+```
+
+When users accept analytics cookies:
+- `analytics_storage` is updated to `'granted'`
+- `personalization_storage` is updated to `'granted'`
+- Google Analytics begins tracking as configured
+
+### Cookie Consent Banner
+
+The consent banner provides:
+1. **Quick Accept/Reject**: Users can quickly accept all or reject non-essential cookies
+2. **Detailed Settings**: Users can view details about each cookie category
+3. **Persistent Storage**: Consent choices are saved in localStorage
+4. **Multilingual**: Banner text in German (primary audience in Switzerland)
+
+### Data Processed
+
+When analytics consent is granted:
+- Page views (automatically)
+- Custom events (quiz interactions, flashcard usage, etc.)
+- Session duration
+- Device type and browser information
+- Geographic location (country/city level only, with anonymized IP)
+
+No data is collected until explicit consent is given.
+
+## Privacy & Compliance (Legacy)
+
 - IP addresses are anonymized
 - No personally identifiable information (PII) is tracked
 - Question text is truncated to 100 characters for privacy
