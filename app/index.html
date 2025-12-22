@@ -99,6 +99,8 @@
       });
       
       // Check if user has previously given consent
+      // Note: This must happen before React loads to ensure GA respects consent immediately
+      // The same check is done in ConsentBanner.jsx to determine if banner should show
       try {
         const savedConsent = localStorage.getItem('cookie-consent');
         if (savedConsent) {
