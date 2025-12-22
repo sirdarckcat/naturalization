@@ -79,20 +79,57 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     
+    <!-- Google Consent Mode V2 - Must load BEFORE gtag.js -->
+    <script>
+      // Initialize dataLayer and gtag function
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      
+      // Set default consent to 'denied' for all consent types
+      // This is required for GDPR/Swiss Data Protection compliance
+      gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'functionality_storage': 'granted',
+        'personalization_storage': 'denied',
+        'security_storage': 'granted',
+        'wait_for_update': 500
+      });
+      
+      // Check if user has previously given consent
+      // Note: This must happen before React loads to ensure GA respects consent immediately
+      // The same check is done in ConsentBanner.jsx to determine if banner should show
+      try {
+        const savedConsent = localStorage.getItem('cookie-consent');
+        if (savedConsent) {
+          const consent = JSON.parse(savedConsent);
+          if (consent.analytics) {
+            gtag('consent', 'update', {
+              'analytics_storage': 'granted',
+              'personalization_storage': 'granted'
+            });
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load consent preferences', e);
+      }
+      
+      // Make gtag available globally for event tracking
+      window.gtag = gtag;
+    </script>
+    
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-FMD5GKG2N2"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
       gtag('config', 'G-FMD5GKG2N2', {
         'send_page_view': true,
-        'anonymize_ip': true
+        'anonymize_ip': true,
+        'cookie_flags': 'SameSite=None;Secure'
       });
-      
-      // Make gtag available globally for event tracking
-      window.gtag = gtag;
     </script>
   </body>
 </html>

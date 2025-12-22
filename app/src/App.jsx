@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { BookOpen, CheckCircle, XCircle, RefreshCw, Trophy, Home, Layers, MapPin, Clock, ChevronRight, ChevronLeft, Globe, Zap, Brain, Trash2, PlayCircle, X, PieChart, BarChart3, Download, Share2, Sparkles } from 'lucide-react';
+import ConsentBanner from './ConsentBanner';
 
 // Analytics tracking utility
 const trackEvent = (eventName, eventParams = {}) => {
@@ -1322,6 +1323,9 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-red-100 selection:text-red-900">
+      {/* Cookie Consent Banner */}
+      <ConsentBanner />
+      
       {/* Social Share Modal for 100% Coverage */}
       {showShareModal && achievedMilestone && (
         <SocialShareModal 
