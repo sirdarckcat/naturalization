@@ -1140,6 +1140,15 @@ const ResultScreen = ({ score, total, onRestart, onHome, checkAndSetMilestone })
       performance_level: percentage >= 90 ? 'excellent' : percentage >= 70 ? 'good' : 'needs_practice'
     });
     
+    // Track Google Ads conversion
+    if (window.gtag) {
+      window.gtag('event', 'conversion', {
+        'send_to': 'AW-17818336608/33GJCP77jtUbEOD6uLBC',
+        'value': 1.0,
+        'currency': 'CHF'
+      });
+    }
+    
     // Check for perfect score milestone (15/15)
     if (score === total && total === 15 && checkAndSetMilestone) {
       const isNew = checkAndSetMilestone('first_perfect_score');
