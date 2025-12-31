@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.gktzh.twa",
+        "sha256_cert_fingerprints": ["6C:FD:C6:AA:41:5E:37:B3:44:F8:FC:51:E5:32:4C:9C:B7:08:53:6B:75:D7:4A:29:DA:59:1B:04:D7:6D:92:FF"]
+      }
+    }]
