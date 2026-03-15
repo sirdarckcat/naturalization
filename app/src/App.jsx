@@ -110,8 +110,8 @@ const SocialShareModal = ({ onClose, milestone }) => {
   const [copySuccess, setCopySuccess] = useState(false);
   
   const shareText = milestone === 'perfect_score' 
-    ? `🎉 Ich habe gerade 15/15 richtig beim Grundkenntnistest Zürich geschafft! Perfekte Punktzahl! 🇨🇭 #Einbürgerung #GKTZürich`
-    : `🎓 Ich habe gerade 100% Abdeckung beim Grundkenntnistest Zürich erreicht! Alle Fragen beantwortet! 🇨🇭 #Einbürgerung #GKTZürich`;
+    ? `🎉 Ich habe gerade 15/15 richtig im Schweiz-und-Zürich-Quiz geschafft! Perfekte Punktzahl! 🇨🇭 #Schweiz #Zürich`
+    : `🎓 Ich habe gerade 100% Abdeckung im Schweiz-und-Zürich-Quiz erreicht! Alle Fragen beantwortet! 🇨🇭 #Schweiz #Zürich`;
   
   const shareUrl = 'https://gktzh.app/';
   
@@ -570,10 +570,10 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
         <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
           <SwissFlag size={64} />
         </div>
-        <h1 className="text-4xl font-bold text-slate-800">Grundkenntnistest Zürich</h1>
+        <h1 className="text-4xl font-bold text-slate-800">Schweiz & Zürich entdecken</h1>
         <p className="text-lg text-slate-600">
-          Bereiten Sie sich optimal auf Ihr Einbürgerungsgespräch und den Kantonalen Test vor.
-          Das System lernt mit und wiederholt schwierige Fragen öfter.
+          Lernen Sie mehr über die Schweiz und Zürich mit Quizfragen, Lernkarten und Videos.
+          Das System lernt mit und wiederholt schwierige Themen öfter.
         </p>
       </div>
 
@@ -686,9 +686,9 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
             <div className="p-4 bg-red-50 rounded-full group-hover:bg-red-100 transition-colors">
               <BookOpen className="w-8 h-8 text-red-600" />
             </div>
-            <h3 className="text-xl font-bold text-slate-800">Smart Quiz</h3>
+            <h3 className="text-xl font-bold text-slate-800">Quiz-Modus</h3>
             <p className="text-slate-500 text-sm">
-              Intelligenter Testmodus. Fragen, die Sie falsch beantworten, kommen öfter dran.
+              Interaktiver Lernmodus. Fragen, die Sie falsch beantworten, kommen öfter dran.
             </p>
             <Button 
               className="w-full"
@@ -713,7 +713,7 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
             </div>
             <h3 className="text-xl font-bold text-slate-800">Lernkarten</h3>
             <p className="text-slate-500 text-sm">
-              Lernen Sie entspannt. Sie können wählen, ob Sie alle oder nur schwierige Karten sehen wollen.
+              Lernen Sie in Ihrem Tempo. Sie können wählen, ob Sie alle oder nur schwierige Karten sehen wollen.
             </p>
             <Button 
               variant="secondary" 
@@ -739,7 +739,7 @@ const WelcomeScreen = ({ onStart, onStartFlashcards, progress, onReset }) => {
             </div>
             <h3 className="text-xl font-bold text-slate-800">Video Playlist</h3>
             <p className="text-slate-500 text-sm text-center">
-              Erklärvideos zum Grundkenntnistest. Öffnet in YouTube und ist offline speicherbar.
+              Erklärvideos über die Schweiz und Zürich. Öffnet in YouTube und ist offline speicherbar.
             </p>
             <Button 
               variant="secondary" 
@@ -1351,12 +1351,12 @@ const App = () => {
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setScreen('welcome')}>
             <SwissFlag size={28} className="drop-shadow-sm" />
-            <span className="font-bold text-xl tracking-tight hidden sm:block">Zürich<span className="text-red-600">Einbürgerung</span></span>
+            <span className="font-bold text-xl tracking-tight hidden sm:block">Zürich<span className="text-red-600">Lernen</span></span>
           </div>
           <div className="flex items-center gap-4">
              {screen !== 'welcome' && (
                <span className="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full uppercase tracking-wider">
-                  {screen === 'quiz' ? 'Prüfung' : screen === 'flashcards' ? 'Training' : 'Ergebnis'}
+                  {screen === 'quiz' ? 'Quiz' : screen === 'flashcards' ? 'Training' : 'Ergebnis'}
                </span>
              )}
              {isInstallable && (
